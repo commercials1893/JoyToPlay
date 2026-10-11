@@ -167,5 +167,21 @@
     "featured": false,
     "top": true,
     "comment": "Zní mnohem složitěji, než ve skutečnosti je. Žádné sóla. Jen akordy a kousek melodie."
+  },
+  {
+    "id": "Nr-AxIdT2k8",
+    "title": "Tohle zní jak kdyby to hrál přímo sám velký Franta Sahula!",
+    "song": "Sovy v mazutu",
+    "youtube": "https://www.youtube.com/watch?v=Nr-AxIdT2k8",
+    "channel": "Kytary.cz",
+    "difficulty": 1,
+    "time": "1 večer",
+    "categories": [
+      "start",
+      "three"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Naprostá klasika, hrozně hezky to zní a chytnou se všichni."
   }
 ]
