@@ -1,0 +1,171 @@
+[
+  {
+    "id": "BBz-Jyr23M4",
+    "title": "Úplný začátek. První lekce.",
+    "song": "For What It's Worth",
+    "youtube": "https://www.youtube.com/watch?v=BBz-Jyr23M4",
+    "channel": "Andy Guitar",
+    "difficulty": 1,
+    "time": "20 minut",
+    "categories": [
+      "start",
+      "three"
+    ],
+    "featured": true,
+    "top": false,
+    "comment": "Dnes se něco naučíš. Dnes si něco zahraješ. Dva akordy a první písnička."
+  },
+  {
+    "id": "ylS3SMfsa9g",
+    "title": "Český první večer",
+    "song": "Když jsem já sloužil",
+    "youtube": "https://www.youtube.com/watch?v=ylS3SMfsa9g",
+    "channel": "Michaela Medek",
+    "difficulty": 1,
+    "time": "20 minut",
+    "categories": [
+      "start"
+    ],
+    "featured": true,
+    "top": false,
+    "comment": "A a E. Nic víc. Příjemný český začátek, u kterého se nemusíš stydět, že začínáš."
+  },
+  {
+    "id": "SV2ehlxGEFw",
+    "title": "Tři akordy a úsměv",
+    "song": "Three Little Birds",
+    "youtube": "https://www.youtube.com/watch?v=SV2ehlxGEFw",
+    "channel": "Andy Guitar",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [
+      "start",
+      "three"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "E, A, D. Zní to jako písnička, ne jako cvičení. Přesně ten poměr náročnost / výsledek."
+  },
+  {
+    "id": "ZUun3_932y0",
+    "title": "Groove, který sedí do ruky",
+    "song": "Bad Moon Rising",
+    "youtube": "https://www.youtube.com/watch?v=ZUun3_932y0",
+    "channel": "Relax and Learn Guitar",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [
+      "three"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Tři otevřené akordy a basová nota. Zní to víc, než to je. Ideální po práci."
+  },
+  {
+    "id": "FOhKXPTbt5k",
+    "title": "Jednoduchost a groove",
+    "song": "Ring of Fire",
+    "youtube": "https://www.youtube.com/watch?v=FOhKXPTbt5k",
+    "channel": "Andy Guitar",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [
+      "cash",
+      "three"
+    ],
+    "featured": true,
+    "top": true,
+    "comment": "Proto má Johnny Cash vlastní sekci. Tři akordy a najednou hraješ něco, co zná každý."
+  },
+  {
+    "id": "lFmVMOB8ycE",
+    "title": "Až to chytneš, opravdu hraješ",
+    "song": "Folsom Prison Blues",
+    "youtube": "https://www.youtube.com/watch?v=lFmVMOB8ycE",
+    "channel": "Andy Guitar",
+    "difficulty": 3,
+    "time": "3 večery",
+    "categories": [
+      "cash"
+    ],
+    "featured": false,
+    "top": true,
+    "comment": "Jedna z prvních skladeb, u které jsem měl pocit, že opravdu hraju. Není kam spěchat."
+  },
+  {
+    "id": "fGuNJKurkNM",
+    "title": "Celý večer s Cash",
+    "song": "5 písní na 3 akordy",
+    "youtube": "https://www.youtube.com/watch?v=fGuNJKurkNM",
+    "channel": "Andy Guitar",
+    "difficulty": 2,
+    "time": "1 týden",
+    "categories": [
+      "cash",
+      "three"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Boy Named Sue, Ring of Fire, Folsom, Jackson. Vezmi kytaru a zůstaň u jednoho člověka."
+  },
+  {
+    "id": "SRHVcZDWB3g",
+    "title": "Fingerstyle pro normální lidi",
+    "song": "Základní vzory pravé ruky",
+    "youtube": "https://www.youtube.com/watch?v=SRHVcZDWB3g",
+    "channel": "Relax and Learn Guitar",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [
+      "fingerstyle"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Žádné extrémní techniky. Palec hraje bas, ostatní prsty zůstanou. Použitelné hned."
+  },
+  {
+    "id": "46ZYT9hdYoQ",
+    "title": "Tady spousta lidí začíná",
+    "song": "Lásko! — Karel Kryl",
+    "youtube": "https://www.youtube.com/watch?v=46ZYT9hdYoQ",
+    "channel": "Michaela Medek",
+    "difficulty": 3,
+    "time": "3 večery",
+    "categories": [
+      "kryl"
+    ],
+    "featured": false,
+    "top": true,
+    "comment": "Kryl má vlastní sekci, protože se k němu vracíme. Michaela to vysvětlí klidně a po česku."
+  },
+  {
+    "id": "yK6YTr2PIj4",
+    "title": "Česká písnička, která sedí",
+    "song": "Síla starejch vín",
+    "youtube": "https://www.youtube.com/watch?v=yK6YTr2PIj4",
+    "channel": "Michaela Medek",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [
+      "three"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Dobře vysvětlené, příjemný přístup. Přesně ten typ návodu, kvůli kterému tenhle web existuje."
+  },
+  {
+    "id": "YaBlUAnHQvY",
+    "title": "Zní mnohem složitěji, než je",
+    "song": "November Rain — snadné akordy",
+    "youtube": "https://www.youtube.com/watch?v=YaBlUAnHQvY",
+    "channel": "Andy Guitar",
+    "difficulty": 3,
+    "time": "3 večery",
+    "categories": [
+      "fingerstyle"
+    ],
+    "featured": false,
+    "top": true,
+    "comment": "Zní mnohem složitěji, než ve skutečnosti je. Žádné sóla. Jen akordy a kousek melodie."
+  }
+]

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Správa videí — Joy To Play</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    [hidden] { display: none !important; }
+    .admin { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+    .admin h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin-bottom: 6px; }
+    .admin h2 { font-size: 1.5rem; margin-bottom: 14px; }
+    .admin .about-card { margin-top: 26px; }
+    .admin label { display: grid; gap: 6px; font-weight: 500; }
+    .admin label small, .hint { font-weight: 400; color: var(--muted); }
+    .admin select { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 12px 14px; font: inherit; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+    .checks label { display: inline-flex; grid-auto-flow: column; align-items: center; gap: 6px; font-weight: 400; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 7px 13px; cursor: pointer; }
+    .checks input { width: auto; }
+    .preview { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .preview img { width: 100%; border-radius: 10px; display: block; }
+    .tip { border-left: 3px solid var(--wood); padding: 4px 0 4px 14px; color: var(--ink-soft); }
+    .msg { padding: 12px 14px; border-radius: 14px; }
+    .msg.ok { background: #e8f1ea; color: #2f5a3d; }
+    .msg.err { background: #f7e6e3; color: #8a2f25; }
+    .list { display: grid; gap: 10px; }
+    .list-item { display: grid; grid-template-columns: 96px 1fr auto; gap: 14px; align-items: center; }
+    .list-item img { width: 96px; border-radius: 8px; display: block; }
+    .list-item strong { display: block; }
+    .list-item span { color: var(--muted); font-size: 0.92rem; }
+    .remove { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 12px; font: inherit; color: var(--muted); cursor: pointer; }
+    .remove:hover { color: #8a2f25; border-color: #8a2f25; }
+    @media (max-width: 600px) { .row, .preview { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="admin">
+    <p class="kicker">Joy To Play · správa</p>
+    <h1>Přidat video</h1>
+    <p class="lead">Vlož odkaz, podívej se na video, napiš svůj komentář. Po kliknutí na OK je hned na webu. <a href="../">Otevřít web</a></p>
+
+    <section class="about-card">
+      <form class="form" id="add-form">
+        <label>Odkaz na YouTube
+          <input name="youtube" type="url" required placeholder="https://www.youtube.com/watch?v=…">
+        </label>
+        <p class="tip" id="tip" hidden></p>
+        <div class="preview" id="preview" hidden>
+          <a id="preview-link" target="_blank" rel="noreferrer"><img id="preview-img" alt=""></a>
+          <div>
+            <strong id="preview-title"></strong>
+            <p class="hint" id="preview-channel"></p>
+            <p><a id="preview-open" target="_blank" rel="noreferrer">Pustit si video</a></p>
+          </div>
+        </div>
+
+        <label>Tvůj nadpis <small>Krátce a lidsky, třeba „Tři akordy a úsměv“.</small>
+          <input name="title" type="text" required>
+        </label>
+        <div class="row">
+          <label>Skladba nebo téma
+            <input name="song" type="text" required placeholder="Three Little Birds">
+          </label>
+          <label>Kanál
+            <input name="channel" type="text" required>
+          </label>
+        </div>
+        <div class="row">
+          <label>Obtížnost
+            <select name="difficulty" required>
+              <option value="1">★ 1/5</option>
+              <option value="2" selected>★★ 2/5</option>
+              <option value="3">★★★ 3/5</option>
+              <option value="4">★★★★ 4/5</option>
+              <option value="5">★★★★★ 5/5</option>
+            </select>
+          </label>
+          <label>Potřebný čas
+            <select name="time" required>
+              <option>20 minut</option>
+              <option selected>1 večer</option>
+              <option>3 večery</option>
+              <option>1 týden</option>
+            </select>
+          </label>
+        </div>
+        <label>Sekce</label>
+        <div class="checks">
+          <label><input type="checkbox" name="categories" value="start"> Začni dnes</label>
+          <label><input type="checkbox" name="categories" value="three"> 3 akordy</label>
+          <label><input type="checkbox" name="categories" value="fingerstyle"> Fingerstyle</label>
+          <label><input type="checkbox" name="categories" value="cash"> Johnny Cash</label>
+          <label><input type="checkbox" name="categories" value="kryl"> Karel Kryl</label>
+          <label><input type="checkbox" name="top"> Top objev</label>
+        </div>
+        <label>Komentář TJ <small>Nejdůležitější část. Proč zrovna tohle?</small>
+          <textarea name="comment" rows="3" required></textarea>
+        </label>
+        <p class="msg" id="msg" hidden></p>
+        <button class="btn btn-dark" type="submit">OK, přidat na web</button>
+      </form>
+    </section>
+
+    <section class="about-card">
+      <h2>Videa na webu <span class="hint" id="count"></span></h2>
+      <div class="list" id="list"></div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("add-form");
+    const msg = document.getElementById("msg");
+    const preview = document.getElementById("preview");
+    const list = document.getElementById("list");
+
+    function say(text, ok) {
+      msg.textContent = text;
+      msg.className = "msg " + (ok ? "ok" : "err");
+      msg.hidden = false;
+    }
+
+    async function lookup() {
+      const url = form.youtube.value.trim();
+      preview.hidden = true;
+      if (!url) return;
+      const res = await fetch("/api/info?url=" + encodeURIComponent(url));
+      const info = await res.json();
+      if (!res.ok) return say(info.error, false);
+      msg.hidden = true;
+      const watch = "https://www.youtube.com/watch?v=" + info.id;
+      document.getElementById("preview-img").src = `https://i.ytimg.com/vi/${info.id}/mqdefault.jpg`;
+      document.getElementById("preview-link").href = watch;
+      document.getElementById("preview-open").href = watch;
+      document.getElementById("preview-title").textContent = info.title || "Název se nepodařilo načíst";
+      document.getElementById("preview-channel").textContent = info.channel;
+      preview.hidden = false;
+      if (info.channel && !form.channel.value) form.channel.value = info.channel;
+      if (info.exists) say("Tohle video už na webu je.", false);
+    }
+
+    async function loadList() {
+      const videos = await (await fetch("/videos.json")).json();
+      document.getElementById("count").textContent = `(${videos.length})`;
+      list.replaceChildren(...videos.map((video) => {
+        const item = document.createElement("div");
+        item.className = "list-item";
+        const img = document.createElement("img");
+        img.src = `https://i.ytimg.com/vi/${video.id}/default.jpg`;
+        img.alt = "";
+        const text = document.createElement("div");
+        const title = document.createElement("strong");
+        title.textContent = video.title;
+        const sub = document.createElement("span");
+        sub.textContent = `${video.song} · ${video.channel} · ${video.difficulty}/5 · ${video.time}`;
+        text.append(title, sub);
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "remove";
+        remove.textContent = "Odebrat";
+        remove.addEventListener("click", async () => {
+          if (!confirm(`Odebrat z webu „${video.title}“?`)) return;
+          const res = await fetch("/api/videos/" + video.id, { method: "DELETE" });
+          if (!res.ok) return say((await res.json()).error, false);
+          say(`Odebráno: ${video.title}`, true);
+          loadList();
+        });
+        item.append(img, text, remove);
+        return item;
+      }));
+    }
+
+    form.youtube.addEventListener("change", lookup);
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.categories = new FormData(form).getAll("categories");
+      data.top = form.top.checked;
+      const res = await fetch("/api/videos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) return say(result.error, false);
+      form.reset();
+      preview.hidden = true;
+      document.getElementById("tip").hidden = true;
+      history.replaceState(null, "", location.pathname);
+      say(`Přidáno: ${result.title}. Už je na webu.`, true);
+      loadList();
+    });
+
+    // Odkaz z tipu může formulář předvyplnit: /sprava/?url=…&why=…
+    const params = new URLSearchParams(location.search);
+    if (params.get("url")) {
+      form.youtube.value = params.get("url");
+      if (params.get("why")) {
+        const tip = document.getElementById("tip");
+        tip.textContent = "Tip od návštěvníka: " + params.get("why");
+        tip.hidden = false;
+      }
+      lookup();
+    }
+    loadList();
+  </script>
+</body>
+</html>
