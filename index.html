@@ -185,9 +185,10 @@
         <form class="form" id="recommend-form">
           <input name="url" type="url" required placeholder="Odkaz na YouTube">
           <input name="why" type="text" required placeholder="Proč to stojí za čas?">
+          <input name="_gotcha" type="text" tabindex="-1" autocomplete="off" hidden>
           <button class="btn btn-dark" type="submit">Poslat TJ</button>
         </form>
-        <p id="recommend-note" hidden style="margin-top:14px;color:#3f6b4e">Díky. Tip je uložený u tebe v prohlížeči — až poběží verze 2 naplno, TJ ho odtud sebere.</p>
+        <p id="recommend-note" hidden style="margin-top:14px"></p>
       </div>
     </section>
 
@@ -202,6 +203,6 @@
   <footer class="footer">
     <div class="wrap">Joy To Play · Nauč se málo. Zahraj hodně. · Verze 1, ručně přidaná videa</div>
   </footer>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

@@ -10,6 +10,11 @@ const CATEGORIES = {
 
 const FALLBACK_VIDEOS = [];
 
+// Adresa formuláře z Formspree (https://formspree.io/f/…). Prázdná = sekce „Doporuč video" se skryje.
+const FORMSPREE_URL = "https://formspree.io/f/xnpjvlyj";
+// Odkaz v e-mailu s tipem otevře správu na počítači TJ s předvyplněným videem.
+const ADMIN_URL = "http://localhost:8765/sprava/";
+
 const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
 
 function youtubeId(url, id) {
@@ -102,16 +107,45 @@ function bindNav() {
 }
 
 function bindForm() {
+  const section = document.getElementById("doporuc");
   const form = document.getElementById("recommend-form");
   const note = document.getElementById("recommend-note");
-  form.addEventListener("submit", (event) => {
+  if (!FORMSPREE_URL) {
+    // Bez adresy formuláře by tip nikam nedošel, sekci proto neukazujeme.
+    section.hidden = true;
+    document.querySelector('.nav-links a[href="#doporuc"]').parentElement.hidden = true;
+    return;
+  }
+  const say = (text, ok) => {
+    note.textContent = text;
+    note.style.color = ok ? "#2f6b45" : "#a1352a";
+    note.hidden = false;
+  };
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(form).entries());
-    const saved = JSON.parse(localStorage.getItem("jtp-tips") || "[]");
-    saved.push({ ...data, at: new Date().toISOString() });
-    localStorage.setItem("jtp-tips", JSON.stringify(saved));
-    form.reset();
-    note.hidden = false;
+    const button = form.querySelector("button");
+    button.disabled = true;
+    try {
+      const res = await fetch(FORMSPREE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: "Joy To Play: tip na video",
+          _gotcha: data._gotcha,
+          video: data.url,
+          proc: data.why,
+          schvalit: `${ADMIN_URL}?url=${encodeURIComponent(data.url)}&why=${encodeURIComponent(data.why)}`,
+        }),
+      });
+      if (!res.ok) throw new Error("send failed");
+      form.reset();
+      say("Díky. Tip je u TJ, podívá se na něj.", true);
+    } catch {
+      say("Tip se nepodařilo odeslat. Zkus to prosím za chvíli znovu.", false);
+    } finally {
+      button.disabled = false;
+    }
   });
 }
 
