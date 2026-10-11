@@ -56,7 +56,24 @@ function newestFirst(videos) {
     .map(({ video }) => video);
 }
 
-function render(videos, filter) {
+// Rychlý výběr: štítky s písničkami z právě vybrané sekce. Klik ukáže jen to video, druhý klik vrátí celou sekci.
+function renderPicks(videos, filter, shown, picked) {
+  const root = document.getElementById("song-picks");
+  const sorted = [...shown].sort((a, b) => a.song.localeCompare(b.song, "cs"));
+  root.replaceChildren(
+    ...sorted.map((video) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "filter" + (video.id === picked ? " is-on" : "");
+      chip.textContent = video.song;
+      chip.addEventListener("click", () => render(videos, filter, video.id === picked ? null : video.id));
+      return chip;
+    }),
+  );
+  root.hidden = sorted.length < 2;
+}
+
+function render(videos, filter, picked = null) {
   const root = document.getElementById("videos");
   const source = filter === "latest" ? newestFirst(videos) : videos;
   const filtered = source.filter((video) => {
@@ -64,8 +81,10 @@ function render(videos, filter) {
     if (filter === "top") return video.top;
     return video.categories.includes(filter);
   });
-  root.innerHTML = filtered.length
-    ? filtered.map(cardHTML).join("")
+  renderPicks(videos, filter, filtered, picked);
+  const cards = picked ? filtered.filter((video) => video.id === picked) : filtered;
+  root.innerHTML = cards.length
+    ? cards.map(cardHTML).join("")
     : `<p class="empty">V téhle sekci zatím nic není. TJ sem přidá jen to, co opravdu stojí za čas.</p>`;
 }
 

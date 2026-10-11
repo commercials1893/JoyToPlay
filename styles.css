@@ -286,6 +286,22 @@ a {
   border-color: var(--ink);
 }
 
+#katalog .filters:not(.song-picks) {
+  margin-bottom: 14px;
+}
+
+.song-picks .filter {
+  background: var(--bg);
+  border-color: var(--line);
+  padding: 6px 13px;
+  font-size: 0.9rem;
+}
+
+.song-picks .filter.is-on {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
 .videos {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
