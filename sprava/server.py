@@ -18,6 +18,7 @@ from pathlib import Path
 PORT = 8765
 ROOT = Path(__file__).resolve().parent.parent
 VIDEOS = ROOT / "videos.json"
+SONGS = ROOT / "pisnicky.json"
 ALLOWED_ORIGINS = {f"http://localhost:{PORT}", f"http://127.0.0.1:{PORT}"}
 CATEGORIES = {"start", "three", "fingerstyle", "cash", "kryl"}
 ID_RE = re.compile(r"^[\w-]{11}$")
@@ -40,12 +41,42 @@ def youtube_id(url):
     return candidate if ID_RE.match(candidate) else ""
 
 
+def read_json(path):
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+
+
+def write_json(path, items):
+    path.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def read_videos():
-    return json.loads(VIDEOS.read_text(encoding="utf-8"))
+    return read_json(VIDEOS)
 
 
 def write_videos(videos):
-    VIDEOS.write_text(json.dumps(videos, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json(VIDEOS, videos)
+
+
+def build_song(data, existing):
+    """Ověří písničku do zpěvníku a vrátí (písnička, chyba)."""
+    url = str(data.get("url", "")).strip()
+    parsed = urllib.parse.urlparse(url)
+    host = parsed.netloc.lower()
+    if parsed.scheme != "https" or not (host == "ultimate-guitar.com" or host.endswith(".ultimate-guitar.com")):
+        return None, "Tohle nevypadá jako odkaz na Ultimate Guitar."
+    if any(s.get("url") == url for s in existing):
+        return None, "Tahle písnička už ve zpěvníku je."
+    artist = str(data.get("artist", "")).strip()
+    song = str(data.get("song", "")).strip()
+    if not artist or not song:
+        return None, "Chybí interpret nebo název písničky."
+    return {
+        "artist": artist,
+        "song": song,
+        "url": url,
+        "note": str(data.get("note", "")).strip(),
+        "added": datetime.datetime.now().isoformat(timespec="seconds"),
+    }, None
 
 
 def build_video(data, existing):
@@ -127,7 +158,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_json(200, info)
 
     def do_POST(self):
-        if self.path != "/api/videos":
+        if self.path not in ("/api/videos", "/api/songs"):
             return self.send_json(404, {"error": "Nenalezeno."})
         if not self.allowed():
             return
@@ -135,6 +166,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             data = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
         except ValueError:
             return self.send_json(400, {"error": "Neplatná data."})
+        if self.path == "/api/songs":
+            songs = read_json(SONGS)
+            song, error = build_song(data, songs)
+            if error:
+                return self.send_json(400, {"error": error})
+            songs.append(song)
+            write_json(SONGS, songs)
+            return self.send_json(201, song)
         videos = read_videos()
         video, error = build_video(data, videos)
         if error:
@@ -144,6 +183,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_json(201, video)
 
     def do_DELETE(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/songs":
+            if not self.allowed():
+                return
+            url = urllib.parse.parse_qs(parsed.query).get("url", [""])[0]
+            songs = read_json(SONGS)
+            kept = [s for s in songs if s.get("url") != url]
+            if len(kept) == len(songs):
+                return self.send_json(404, {"error": "Písnička ve zpěvníku není."})
+            write_json(SONGS, kept)
+            return self.send_json(200, {"removed": url})
         if not self.path.startswith("/api/videos/"):
             return self.send_json(404, {"error": "Nenalezeno."})
         if not self.allowed():

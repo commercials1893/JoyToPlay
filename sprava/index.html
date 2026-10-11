@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css?v=14">
+  <link rel="stylesheet" href="../styles.css?v=16">
   <style>
     [hidden] { display: none !important; }
     .admin { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
@@ -109,6 +109,34 @@
       <h2>Videa na webu <span class="hint" id="count"></span></h2>
       <div class="list" id="list"></div>
     </section>
+    <h1 style="margin-top:64px">Zpěvník</h1>
+    <p class="lead">Odkazy na akordy z Ultimate Guitar. Interpret a název se zkusí doplnit z odkazu, zkontroluj je.</p>
+
+    <section class="about-card">
+      <form class="form" id="song-form">
+        <label>Odkaz na Ultimate Guitar
+          <input name="url" type="url" required placeholder="https://tabs.ultimate-guitar.com/tab/…">
+        </label>
+        <div class="row">
+          <label>Interpret
+            <input name="artist" type="text" required>
+          </label>
+          <label>Písnička
+            <input name="song" type="text" required>
+          </label>
+        </div>
+        <label>Poznámka <small>Nepovinná, třeba „kapo 2“ nebo „jen tři akordy“.</small>
+          <input name="note" type="text">
+        </label>
+        <p class="msg" id="song-msg" hidden></p>
+        <button class="btn btn-dark" type="submit">OK, přidat do zpěvníku</button>
+      </form>
+    </section>
+
+    <section class="about-card">
+      <h2>Písničky ve zpěvníku <span class="hint" id="song-count"></span></h2>
+      <div class="list" id="song-list"></div>
+    </section>
   </main>
 
   <script>
@@ -207,6 +235,81 @@
       lookup();
     }
     loadList();
+  </script>
+  <script>
+    const songForm = document.getElementById("song-form");
+    const songMsg = document.getElementById("song-msg");
+
+    function saySong(text, ok) {
+      songMsg.textContent = text;
+      songMsg.className = "msg " + (ok ? "ok" : "err");
+      songMsg.hidden = false;
+    }
+
+    // Z adresy typu /tab/johnny-cash/hurt-chords-89849 odhadne interpreta a název.
+    function guessFromUrl(url) {
+      try {
+        const [, , artist, song] = new URL(url).pathname.split("/");
+        if (!artist || !song) return {};
+        const words = (slug) => slug.split("-").filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+        const title = song.replace(/-(ukulele-chords|bass-tabs|drum-tabs|guitar-pro|chords|tabs|tab|power|official|video|pro)-\d+$/, "");
+        return { artist: words(artist), song: words(title) };
+      } catch {
+        return {};
+      }
+    }
+
+    async function loadSongs() {
+      const songs = await (await fetch("/pisnicky.json")).json();
+      songs.sort((a, b) => a.artist.localeCompare(b.artist, "cs") || a.song.localeCompare(b.song, "cs"));
+      document.getElementById("song-count").textContent = `(${songs.length})`;
+      document.getElementById("song-list").replaceChildren(...songs.map((song) => {
+        const item = document.createElement("div");
+        item.className = "list-item";
+        item.style.gridTemplateColumns = "1fr auto";
+        const text = document.createElement("div");
+        const title = document.createElement("strong");
+        title.textContent = song.song;
+        const sub = document.createElement("span");
+        sub.textContent = song.note ? `${song.artist} · ${song.note}` : song.artist;
+        text.append(title, sub);
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "remove";
+        remove.textContent = "Odebrat";
+        remove.addEventListener("click", async () => {
+          if (!confirm(`Odebrat ze zpěvníku „${song.song}“?`)) return;
+          const res = await fetch("/api/songs?url=" + encodeURIComponent(song.url), { method: "DELETE" });
+          if (!res.ok) return saySong((await res.json()).error, false);
+          saySong(`Odebráno: ${song.song}`, true);
+          loadSongs();
+        });
+        item.append(text, remove);
+        return item;
+      }));
+    }
+
+    songForm.url.addEventListener("change", () => {
+      const guess = guessFromUrl(songForm.url.value.trim());
+      if (guess.artist && !songForm.artist.value) songForm.artist.value = guess.artist;
+      if (guess.song && !songForm.song.value) songForm.song.value = guess.song;
+    });
+
+    songForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const res = await fetch("/api/songs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(songForm).entries())),
+      });
+      const result = await res.json();
+      if (!res.ok) return saySong(result.error, false);
+      songForm.reset();
+      saySong(`Přidáno: ${result.song}`, true);
+      loadSongs();
+    });
+
+    loadSongs();
   </script>
 </body>
 </html>

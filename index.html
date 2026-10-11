@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=14">
+  <link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
   <header class="site-header">
@@ -24,6 +24,7 @@
       <button class="menu-btn" type="button" aria-label="Menu">Menu</button>
       <ul class="nav-links">
         <li><a href="#videa">Videa</a></li>
+        <li><a href="#zpevnik">Zpěvník</a></li>
         <li><a href="#sekce">Sekce</a></li>
         <li><a href="#kanaly">Kanály</a></li>
         <li><a href="#tj">O mně</a></li>
@@ -131,6 +132,16 @@
       </div>
     </section>
 
+    <section class="section" id="zpevnik" hidden>
+      <div class="wrap">
+        <h2>Můj zpěvník</h2>
+        <p class="lead">Písničky, které hraju nejradši. Akordy jsou na Ultimate Guitar, stačí kliknout.</p>
+        <input class="song-search" id="song-search" type="search" placeholder="Hledat písničku nebo interpreta" aria-label="Hledat ve zpěvníku">
+        <div class="filters" id="song-chips"></div>
+        <div class="songs" id="songs"></div>
+      </div>
+    </section>
+
     <section class="section" id="kanaly">
       <div class="wrap">
         <h2>Doporučené kanály</h2>
@@ -217,6 +228,6 @@
   <footer class="footer">
     <div class="wrap">Joy To Play · Nauč se málo. Zahraj hodně. · Videa vybírám ručně. TJ</div>
   </footer>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>

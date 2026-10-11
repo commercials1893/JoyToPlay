@@ -183,5 +183,21 @@
     "featured": false,
     "top": false,
     "comment": "Naprostá klasika, hrozně hezky to zní a chytnou se všichni."
+  },
+  {
+    "id": "dB7y6YM6RZw",
+    "title": "Klasika na pár akordů",
+    "song": "Knockin' on Heaven's Door",
+    "youtube": "https://www.youtube.com/watch?v=dB7y6YM6RZw",
+    "channel": "Kytary.cz",
+    "difficulty": 1,
+    "time": "1 večer",
+    "categories": [
+      "start"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Česky nebo anglicky. Dylan, GnR nebo Tři sestry... je to jedno, zní to prostě nesmrtelně.",
+    "added": "2026-10-11T12:06:33"
   }
 ]

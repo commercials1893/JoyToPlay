@@ -168,9 +168,120 @@ async function loadVideos() {
   }
 }
 
+const plain = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+function songGroup(artist, list) {
+  const group = document.createElement("div");
+  group.className = "song-group";
+  const title = document.createElement("h3");
+  title.textContent = artist;
+  const items = document.createElement("ul");
+  list.forEach((song) => {
+    const item = document.createElement("li");
+    const link = document.createElement("a");
+    link.href = song.url;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = song.song;
+    item.append(link);
+    if (song.note) {
+      const note = document.createElement("span");
+      note.textContent = song.note;
+      item.append(note);
+    }
+    items.append(item);
+  });
+  group.append(title, items);
+  return group;
+}
+
+// Zpěvník: odkazy na akordy, samotné akordy na webu nejsou. Bez písniček se sekce neukáže.
+async function initSongs() {
+  let songs = [];
+  try {
+    const res = await fetch("pisnicky.json", { cache: "no-store" });
+    if (res.ok) songs = await res.json();
+  } catch {
+    /* zpěvník je volitelný */
+  }
+  if (!songs.length) {
+    document.querySelector('.nav-links a[href="#zpevnik"]').parentElement.hidden = true;
+    return;
+  }
+  const root = document.getElementById("songs");
+  const chips = document.getElementById("song-chips");
+  const search = document.getElementById("song-search");
+  document.getElementById("zpevnik").hidden = false;
+
+  const groups = new Map();
+  songs
+    .sort((a, b) => a.artist.localeCompare(b.artist, "cs") || a.song.localeCompare(b.song, "cs"))
+    .forEach((song) => groups.set(song.artist, [...(groups.get(song.artist) || []), song]));
+
+  // Všichni interpreti pod sebou; při hledání jen ti, u kterých něco sedí.
+  const showAll = (query) => {
+    const needle = plain(query.trim());
+    const found = [...groups]
+      .map(([artist, list]) => [artist, list.filter((song) => !needle || plain(`${artist} ${song.song}`).includes(needle))])
+      .filter(([, list]) => list.length);
+    root.className = "songs";
+    root.replaceChildren(...found.map(([artist, list]) => songGroup(artist, list)));
+    if (!found.length) root.innerHTML = `<p class="empty">Tuhle písničku ve zpěvníku nemám.</p>`;
+  };
+  const showArtist = (artist) => {
+    root.className = "songs is-single";
+    root.replaceChildren(songGroup(artist, groups.get(artist)));
+  };
+
+  let selected = null;
+  const select = (chip) => {
+    selected = chip;
+    chips.querySelectorAll(".filter").forEach((el) => el.classList.toggle("is-on", el === chip));
+    if (!chip) return;
+    search.value = "";
+    if (chip.dataset.artist) showArtist(chip.dataset.artist);
+    else showAll("");
+  };
+  const addChip = (label, count, artist) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "filter";
+    chip.textContent = label;
+    if (artist) chip.dataset.artist = artist;
+    const number = document.createElement("span");
+    number.className = "count";
+    number.textContent = count;
+    chip.append(number);
+    chip.addEventListener("click", () => select(chip));
+    chips.append(chip);
+    return chip;
+  };
+
+  const all = addChip("Vše", songs.length);
+  const byCount = [...groups].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], "cs"));
+  const artistChips = byCount.map(([artist, list]) => addChip(artist, list.length, artist));
+  const initial = artistChips[0] || all;
+  select(initial);
+
+  // Hledání jde přes celý zpěvník; po smazání se vrátí naposledy vybraný interpret.
+  let beforeSearch = initial;
+  search.addEventListener("input", () => {
+    if (search.value.trim()) {
+      if (selected) beforeSearch = selected;
+      const query = search.value;
+      select(null);
+      search.value = query;
+      showAll(query);
+    } else {
+      select(beforeSearch);
+    }
+  });
+}
+
 async function init() {
   bindNav();
   bindForm();
+  initSongs();
   const videos = await loadVideos();
   if (!videos.length) {
     document.getElementById("videos").innerHTML =
