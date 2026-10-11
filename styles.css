@@ -99,17 +99,33 @@ a {
 }
 
 .hero {
-  position: relative;
-  overflow: hidden;
-  background: var(--bg);
+  padding: 28px 0 0;
 }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+.hero-panel {
+  position: relative;
+  overflow: hidden;
+  display: flex;
   align-items: center;
-  min-height: calc(100vh - 56px);
-  gap: 32px;
+  min-height: min(640px, calc(100vh - 120px));
+  padding: 72px 64px;
+  background: var(--surface);
+  border-radius: 36px;
+}
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+  max-width: 42%;
+}
+
+.hero-guitar {
+  position: absolute;
+  right: -3%;
+  top: 50%;
+  width: 56%;
+  transform: translateY(-50%) rotate(-24deg);
+  mix-blend-mode: multiply;
 }
 
 .kicker {
@@ -176,29 +192,9 @@ a {
   border-color: var(--line);
 }
 
-.hero-visual {
-  position: relative;
-  min-height: 70vh;
-}
-
-.hero-visual img {
-  width: 100%;
-  height: 78vh;
-  object-fit: cover;
-  object-position: 55% 40%;
-  border-radius: 28px;
-}
-
-.wood-chip {
-  position: absolute;
-  left: 24px;
-  bottom: 28px;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  background: rgba(255, 255, 255, 0.82);
-  border-radius: 16px;
-  padding: 14px 16px;
-  font-size: 0.9rem;
+.hero .btn-ghost {
+  background: #fff;
+  border-color: transparent;
 }
 
 .section {
@@ -472,7 +468,6 @@ textarea {
 }
 
 @media (max-width: 900px) {
-  .hero-grid,
   .promise,
   .videos,
   .cats,
@@ -482,9 +477,23 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .hero-visual img {
-    height: 46vh;
-    border-radius: 24px;
+  .hero-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 0;
+    padding: 40px 28px;
+    border-radius: 28px;
+  }
+
+  .hero-text {
+    max-width: none;
+  }
+
+  .hero-guitar {
+    position: static;
+    width: 100%;
+    transform: rotate(-12deg);
+    margin: 48px 0 36px;
   }
 
   .menu-btn {

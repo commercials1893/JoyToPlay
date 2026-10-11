@@ -157,7 +157,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 def main():
     handler = functools.partial(Handler, directory=str(ROOT))
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), handler)
+    try:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), handler)
+    except OSError:
+        # Správa už běží (třeba z dřívějšího dvojkliku), stačí ji otevřít.
+        print("Správa už běží, otevírám ji v prohlížeči.")
+        webbrowser.open(f"http://localhost:{PORT}/sprava/")
+        return
     print(f"Joy To Play běží na http://localhost:{PORT}")
     print(f"Správa videí:   http://localhost:{PORT}/sprava/")
     print("Ukončíš zavřením tohoto okna nebo Ctrl+C.")
