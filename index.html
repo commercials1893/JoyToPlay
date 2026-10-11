@@ -4,23 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Joy To Play — Nauč se málo. Zahraj hodně.</title>
-  <meta name="description" content="Kytara pro normální lidi. Osobní průvodce TJ: jednoduché skladby, kvalitní videa a věci, které zní lépe, než jsou těžké.">
+  <meta name="description" content="Kytara jen tak pro radost. Nejsem kytarová škola, jen sdílím videa, podle kterých se dá zahrát něco, co je snadné a hezky to zní.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
   <header class="site-header">
     <div class="wrap nav">
-      <a class="logo" href="#top">Joy To <span>Play</span></a>
+      <a class="logo" href="#top">
+        <svg class="logo-pick" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M50 4 C81 4 95 21 91 42 C87 65 67 89 50 96 C33 89 13 65 9 42 C5 21 19 4 50 4 Z"/>
+          <text transform="rotate(-7 50 46)" text-anchor="middle"><tspan x="50" y="40">Karel</tspan><tspan x="50" y="64">Kryl</tspan></text>
+        </svg>
+        <span>Joy To Play</span>
+      </a>
       <button class="menu-btn" type="button" aria-label="Menu">Menu</button>
       <ul class="nav-links">
         <li><a href="#videa">Videa</a></li>
         <li><a href="#sekce">Sekce</a></li>
         <li><a href="#kanaly">Kanály</a></li>
-        <li><a href="#tj">O TJ</a></li>
+        <li><a href="#tj">O mně</a></li>
         <li><a href="#doporuc">Doporuč</a></li>
       </ul>
     </div>
@@ -31,13 +37,13 @@
       <div class="wrap">
         <div class="hero-panel">
           <div class="hero-text">
-            <p class="kicker">Kytara pro normální lidi</p>
+            <p class="kicker">Kytara jen tak pro radost</p>
             <h1>Joy To Play</h1>
             <p class="motto">Nauč se málo. Zahraj hodně.</p>
-            <p>Tohle není kytarová škola. Je to osobní průvodce pro lidi, kteří mají práci, rodinu a další koníčky — a chtějí si občas vzít kytaru do ruky a mít z toho radost.</p>
+            <p>Nejsem kytarová škola. Jen sdílím videa, podle kterých se dá zahrát něco, co je celkem snadné a hezky to zní. Pro lidi, kteří mají práci, rodinu a na kytaru pár volných večerů.</p>
             <div class="hero-actions">
               <a class="btn btn-dark" href="#katalog">Začni dnes</a>
-              <a class="btn btn-ghost" href="#tj">Kdo je TJ</a>
+              <a class="btn btn-ghost" href="#tj">O mně</a>
             </div>
           </div>
           <img class="hero-guitar" src="assets/kytara-ll16.jpg" alt="Yamaha LL16, akustická kytara Joy To Play">
@@ -48,19 +54,19 @@
     <section class="section">
       <div class="wrap">
         <h2>Nemusíš hledat dvě hodiny na YouTube</h2>
-        <p class="lead">TJ už to za tebe prošel. Vybral jen to, co zní lépe, než je těžké.</p>
+        <p class="lead">Už jsem to prošel za tebe. Nechal jsem jen to, co zní neuvěřitelně dobře a přitom je to snadné.</p>
         <div class="promise">
           <article>
-            <strong>Jednoduché skladby</strong>
-            <p>Věci, které se dají zahrát po práci. Ne závod o tempo.</p>
+            <strong>Jde to zahrát</strong>
+            <p>Písničky, které zvládneš po práci. Žádné závody v rychlosti.</p>
           </article>
           <article>
-            <strong>Kvalitní videa</strong>
-            <p>Málo položek. Jen opravdu dobré návody, které dávají smysl.</p>
+            <strong>Málo, ale dobře</strong>
+            <p>Pár videí, kde to někdo vysvětlí tak, že to pochopíš.</p>
           </article>
           <article>
-            <strong>Komentář TJ</strong>
-            <p>Nejdůležitější část webu. Proč zrovna tohle — lidskou řečí.</p>
+            <strong>Pár slov ode mě</strong>
+            <p>U každého videa napíšu, proč mě baví a co od něj čekat.</p>
           </article>
         </div>
       </div>
@@ -69,7 +75,7 @@
     <section class="section" id="katalog">
       <div class="wrap">
         <h2 id="videa">Doporučená videa</h2>
-        <p class="lead">Srdce projektu. Ne stovky videí. Jen věci, které stojí za tvůj čas.</p>
+        <p class="lead">Žádné stovky videí. Jen ta, ke kterým se sám vracím.</p>
         <div class="filters" role="tablist">
           <button class="filter is-on" data-filter="latest" type="button">Nejnovější</button>
           <button class="filter" data-filter="all" type="button">Vše</button>
@@ -89,7 +95,7 @@
     <section class="section" id="sekce">
       <div class="wrap">
         <h2>Kam se vydat</h2>
-        <p class="lead">Každá sekce má jeden důvod. Žádný tlak. Zkus to, užij si to.</p>
+        <p class="lead">Vyber si podle nálady. Nikam se nespěchá.</p>
         <div class="cats">
           <a class="cat-card" href="#katalog" data-jump="start">
             <small>01</small>
@@ -99,27 +105,27 @@
           <a class="cat-card" href="#katalog" data-jump="three">
             <small>02</small>
             <h3>3 akordy a hotovo</h3>
-            <p>Nejjednodušší skladby. Nejvyšší poměr náročnost / výsledek.</p>
+            <p>Tři akordy, a už to zní jako písnička. Nejmíň dřiny, nejvíc radosti.</p>
           </a>
           <a class="cat-card" href="#katalog" data-jump="fingerstyle">
             <small>03</small>
-            <h3>Fingerstyle pro normální lidi</h3>
-            <p>Žádné extrémní techniky. Jen použitelné věci.</p>
+            <h3>Fingerstyle, co se dá zvládnout</h3>
+            <p>Vybrnkávání bez akrobacie. Věci, které opravdu použiješ.</p>
           </a>
           <a class="cat-card" href="#katalog" data-jump="cash">
             <small>04</small>
             <h3>Johnny Cash</h3>
-            <p>Vlastní sekce. Protože jednoduchost a groove.</p>
+            <p>Pár akordů a rytmus, který táhne. Na Cashovi se učí skvěle.</p>
           </a>
           <a class="cat-card" href="#katalog" data-jump="kryl">
             <small>05</small>
             <h3>Karel Kryl</h3>
-            <p>Vlastní sekce. Protože spousta lidí začíná právě zde.</p>
+            <p>U Kryla začínala spousta z nás. Kytara a hlas, víc není potřeba.</p>
           </a>
           <a class="cat-card" href="#katalog" data-jump="top">
             <small>06</small>
             <h3>Top objevy</h3>
-            <p>Jen několik výjimečných videí z celého webu.</p>
+            <p>Pár videí, u kterých jsem si řekl: tohle musím ukázat dál.</p>
           </a>
         </div>
       </div>
@@ -128,7 +134,7 @@
     <section class="section" id="kanaly">
       <div class="wrap">
         <h2>Doporučené kanály</h2>
-        <p class="lead">Když už klikáš na YouTube, tady jsou lidé, ke kterým se vyplatí vracet.</p>
+        <p class="lead">Když už jsi na YouTube, k těmhle lidem se vyplatí vracet.</p>
         <div class="channels">
           <a class="channel-card" href="https://www.youtube.com/@andyguitar" target="_blank" rel="noreferrer">
             <h3>Andy Guitar</h3>
@@ -147,32 +153,39 @@
             <p>České návody a příjemný přístup. Kryl, písničky, klid.</p>
           </a>
         </div>
+        <p class="thanks">Díky všem, kdo ta videa točí. Je za nimi spousta práce a moc si jí vážím. Když ti některé pomůže, dej autorovi lajk nebo odběr.</p>
       </div>
     </section>
 
     <section class="section" id="tj">
       <div class="wrap about-grid">
         <article class="about-card">
-          <p class="kicker">Kdo je TJ</p>
-          <h2>Není to pohled profesionála</h2>
-          <p>TJ není učitel. TJ není virtuóz. Hraje přibližně 30 let, měl dlouhé přestávky a vždycky se ke kytaře vrátí.</p>
-          <p style="margin-top:14px">Právě proto je doporučení důvěryhodné. Je to pohled běžného člověka, který má práci, život — a kytaru, ke které se vrací.</p>
-          <p style="margin-top:14px">Yamaha LL16. Epiphone Dove Studio. Hraj pro radost.</p>
+          <p class="kicker">O mně</p>
+          <h2>Nejsem učitel ani virtuóz</h2>
+          <p>Na kytaru hraju asi 30 let. S dlouhými pauzami, ale vždycky jsem se k ní vrátil.</p>
+          <p style="margin-top:14px">Mám práci a běžný život jako ty, takže tu najdeš jen to, co se dá zvládnout a udělá radost.</p>
+          <p style="margin-top:14px">Hraju na Yamahu LL16 a Epiphone Dove Studio.</p>
         </article>
         <article class="about-card">
-          <p class="kicker">Tón webu</p>
-          <div class="tone" style="box-shadow:none;border:0;padding:0;background:none;display:grid;gap:18px">
-            <ul>
-              <li class="no">Musíš cvičit.</li>
-              <li class="no">Tohle hraješ špatně.</li>
-              <li class="no">Bez hudební teorie to nejde.</li>
-            </ul>
-            <ul>
-              <li class="yes">Zkus to.</li>
-              <li class="yes">Užij si to.</li>
-              <li class="yes">Není kam spěchat.</li>
-              <li class="yes">Hraj pro radost.</li>
-            </ul>
+          <p class="kicker">Můj přístup</p>
+          <div class="tone">
+            <div>
+              <h3>Tady neuslyšíš</h3>
+              <ul class="no">
+                <li>Musíš cvičit.</li>
+                <li>Tohle hraješ špatně.</li>
+                <li>Bez hudební teorie to nejde.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Tady uslyšíš</h3>
+              <ul class="yes">
+                <li>Zkus to.</li>
+                <li>Užij si to.</li>
+                <li>Není kam spěchat.</li>
+                <li>Hraj pro radost.</li>
+              </ul>
+            </div>
           </div>
         </article>
       </div>
@@ -180,9 +193,9 @@
 
     <section class="section" id="doporuc">
       <div class="wrap about-card" style="max-width:720px;margin:0 auto">
-        <p class="kicker">Verze 2</p>
+        <p class="kicker">Máš tip?</p>
         <h2>Doporuč video</h2>
-        <p class="lead">Narazil jsi na návod, který zní lépe, než je těžký? Pošli ho. Ručně vybraný katalog zůstane malý.</p>
+        <p class="lead">Našel jsi video, podle kterého to jde a hezky to zní? Pošli mi ho. Podívám se a ta nejlepší sem přidám.</p>
         <form class="form" id="recommend-form">
           <input name="url" type="url" required placeholder="Odkaz na YouTube">
           <input name="why" type="text" required placeholder="Proč to stojí za čas?">
@@ -195,14 +208,14 @@
 
     <section class="section">
       <div class="wrap" style="text-align:center;max-width:720px">
-        <h2>Co je úspěch</h2>
-        <p class="lead" style="margin:18px auto 0">Úspěch není sto tisíc návštěvníků. Úspěch je, když někdo po práci vezme kytaru do ruky, otevře Joy To Play a najde jednu věc, která mu udělá radost.</p>
+        <h2>Proč to dělám</h2>
+        <p class="lead" style="margin:18px auto 0">Nejde mi o návštěvnost. Stačí, když si po práci vezmeš kytaru, najdeš tu jednu věc a udělá ti radost.</p>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="wrap">Joy To Play · Nauč se málo. Zahraj hodně. · Verze 1, ručně přidaná videa</div>
+    <div class="wrap">Joy To Play · Nauč se málo. Zahraj hodně. · Videa vybírám ručně. TJ</div>
   </footer>
   <script src="app.js?v=9"></script>
 </body>

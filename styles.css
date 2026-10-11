@@ -62,6 +62,10 @@ a {
 }
 
 .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
   font-family: var(--display);
   font-weight: 600;
   font-size: 1.1rem;
@@ -69,8 +73,19 @@ a {
   text-decoration: none;
 }
 
-.logo span {
-  color: var(--wood-deep);
+/* Trsátko bere barvu textu, nápis na něm barvu pozadí: na světlém černé, na tmavém bílé. */
+.logo-pick {
+  height: 42px;
+  width: 42px;
+  flex: none;
+  fill: currentColor;
+}
+
+.logo-pick text {
+  fill: var(--bg);
+  font-family: Caveat, "Bradley Hand", cursive;
+  font-size: 27px;
+  font-weight: 700;
 }
 
 .nav-links {
@@ -427,29 +442,66 @@ a {
   margin-bottom: 8px;
 }
 
+.thanks {
+  margin-top: 28px;
+  max-width: 40rem;
+  color: var(--ink-soft);
+}
+
 .tone {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 24px;
+}
+
+.tone h3 {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
 }
 
 .tone ul {
   list-style: none;
   background: var(--bg);
-  border-radius: var(--radius);
-  padding: 28px 32px;
+  border-radius: 18px;
+  padding: 18px 22px;
+}
+
+.tone li {
+  display: flex;
+  gap: 12px;
 }
 
 .tone li + li {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
-.no {
+.tone li::before {
+  flex: none;
+  width: 1.1em;
+  font-weight: 700;
+}
+
+.no li {
   color: #86868b;
+  text-decoration: line-through;
+  text-decoration-color: var(--line);
 }
 
-.yes {
+.no li::before {
+  content: "✕";
+  text-decoration: none;
+}
+
+.yes li {
   color: var(--ink);
+  font-weight: 500;
+}
+
+.yes li::before {
+  content: "✓";
+  color: var(--wood-deep);
 }
 
 .about-grid {
@@ -506,7 +558,6 @@ textarea {
   .videos,
   .cats,
   .channels,
-  .tone,
   .about-grid {
     grid-template-columns: 1fr;
   }
