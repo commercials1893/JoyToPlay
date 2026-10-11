@@ -12,8 +12,6 @@ const FALLBACK_VIDEOS = [];
 
 // Adresa formuláře z Formspree (https://formspree.io/f/…). Prázdná = sekce „Doporuč video" se skryje.
 const FORMSPREE_URL = "https://formspree.io/f/xnpjvlyj";
-// Odkaz v e-mailu s tipem otevře správu na počítači TJ s předvyplněným videem.
-const ADMIN_URL = "http://localhost:8765/sprava/";
 
 const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
 
@@ -127,15 +125,15 @@ function bindForm() {
     const button = form.querySelector("button");
     button.disabled = true;
     try {
+      // Skryté pole vyplní jen robot; takový tip neposíláme.
+      if (data._gotcha) throw new Error("spam");
       const res = await fetch(FORMSPREE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           _subject: "Joy To Play: tip na video",
-          _gotcha: data._gotcha,
           video: data.url,
           proc: data.why,
-          schvalit: `${ADMIN_URL}?url=${encodeURIComponent(data.url)}&why=${encodeURIComponent(data.why)}`,
         }),
       });
       if (!res.ok) throw new Error("send failed");
