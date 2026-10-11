@@ -199,5 +199,49 @@
     "top": false,
     "comment": "Česky nebo anglicky. Dylan, GnR nebo Tři sestry... je to jedno, zní to prostě nesmrtelně.",
     "added": "2026-10-11T12:06:33"
+  },
+  {
+    "id": "BL1iIasJNKY",
+    "title": "Do hospody i k táboráku",
+    "song": "Jasná zpráva",
+    "youtube": "https://www.youtube.com/watch?v=BL1iIasJNKY",
+    "channel": "Kytary.cz",
+    "difficulty": 1,
+    "time": "1 večer",
+    "categories": [
+      "start"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Lehký rytmus a jedno z nejznámějších sól, které je velmi jednoduché.",
+    "added": "2026-10-11T12:15:36"
+  },
+  {
+    "id": "msf7UL6VAXE",
+    "title": "Silná melodie",
+    "song": "Slzy tvý mámy",
+    "youtube": "https://www.youtube.com/watch?v=msf7UL6VAXE",
+    "channel": "Kytary.cz",
+    "difficulty": 3,
+    "time": "3 večery",
+    "categories": [],
+    "featured": false,
+    "top": false,
+    "comment": "Malinko těžší, už je tam barré akord a u vyhrávky složitější prstoklad, ale výsledek stojí za naučení. Zní to parádně.",
+    "added": "2026-10-11T12:18:57"
+  },
+  {
+    "id": "WmYBMOmkjFg",
+    "title": "Ikonická melodie",
+    "song": "Muchomůrky bílé",
+    "youtube": "https://www.youtube.com/watch?v=WmYBMOmkjFg",
+    "channel": "Kytary.cz",
+    "difficulty": 3,
+    "time": "3 večery",
+    "categories": [],
+    "featured": false,
+    "top": true,
+    "comment": "Akordy jsou celkem snadné, trochu cviku to chce s rytmem a přitlumováním. Zní to ale báječně. Jedna z mých nejoblíbenějších.",
+    "added": "2026-10-11T12:22:51"
   }
 ]

@@ -97,9 +97,8 @@ def build_video(data, existing):
     if not 1 <= difficulty <= 5:
         return None, "Obtížnost musí být 1 až 5."
     categories = [c for c in data.get("categories", []) if c in CATEGORIES]
+    # Sekce je nepovinná: video bez ní je vidět v „Nejnovější" a „Vše".
     top = bool(data.get("top"))
-    if not categories and not top:
-        return None, "Vyber aspoň jednu sekci."
     return {
         "id": vid,
         "title": text["title"],
