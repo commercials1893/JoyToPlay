@@ -1,5 +1,6 @@
 const CATEGORIES = {
   all: "Všechna videa",
+  latest: "Nejnovější",
   start: "Začni dnes",
   three: "3 akordy a hotovo",
   fingerstyle: "Fingerstyle",
@@ -13,7 +14,9 @@ const FALLBACK_VIDEOS = [];
 // Adresa formuláře z Formspree (https://formspree.io/f/…). Prázdná = sekce „Doporuč video" se skryje.
 const FORMSPREE_URL = "https://formspree.io/f/xnpjvlyj";
 
-const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
+const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
+
+const bars = (n) => Array.from({ length: 5 }, (_, i) => `<i${i < n ? ' class="on"' : ""}></i>`).join("");
 
 function youtubeId(url, id) {
   if (id) return id;
@@ -28,28 +31,36 @@ function cardHTML(video) {
   const id = youtubeId(video.youtube, video.id);
   return `
     <article class="video-card" data-cats="${video.categories.join(" ")}" data-top="${video.top}">
-      <a class="thumb" href="${video.youtube}" data-play="${id}" aria-label="Přehrát ${video.title}">
+      <a class="thumb" href="${video.youtube}" data-play="${id}" aria-label="Přehrát ${video.song}">
         <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="">
         <span class="play">Přehrát na YouTube</span>
       </a>
       <div class="card-body">
-        <div class="meta">
-          <span>${video.channel}</span>
-          <span class="stars" title="Obtížnost ${video.difficulty}/5">${stars(video.difficulty)} ${video.difficulty}/5</span>
-          <span>${video.time}</span>
+        <h3>${video.song}</h3>
+        <p class="by">${video.channel}</p>
+        <div class="facts">
+          <span><span class="bars" aria-hidden="true">${bars(video.difficulty)}</span>Obtížnost <b>${video.difficulty}/5 · ${LEVELS[video.difficulty]}</b></span>
+          <span>Čas <b>${video.time}</b></span>
         </div>
-        <h3>${video.title}</h3>
-        <p class="song">${video.song}</p>
-        <p class="comment">${video.comment}</p>
+        <p class="comment"><strong>${video.title}</strong><span>${video.comment}</span></p>
       </div>
     </article>
   `;
 }
 
+// Nejnovější nahoře: podle data přidání, starší videa bez data podle pořadí v seznamu.
+function newestFirst(videos) {
+  return videos
+    .map((video, index) => ({ video, index }))
+    .sort((a, b) => (b.video.added || "").localeCompare(a.video.added || "") || b.index - a.index)
+    .map(({ video }) => video);
+}
+
 function render(videos, filter) {
   const root = document.getElementById("videos");
-  const filtered = videos.filter((video) => {
-    if (filter === "all") return true;
+  const source = filter === "latest" ? newestFirst(videos) : videos;
+  const filtered = source.filter((video) => {
+    if (filter === "all" || filter === "latest") return true;
     if (filter === "top") return video.top;
     return video.categories.includes(filter);
   });
@@ -166,7 +177,7 @@ async function init() {
       "<p class=\"empty\">Videa se nepodařilo načíst. Otevři web přes malý lokální server, ne jen jako soubor.</p>";
     return;
   }
-  render(videos, "all");
+  render(videos, "latest");
   bindFilters(videos);
   bindPlayer();
 }

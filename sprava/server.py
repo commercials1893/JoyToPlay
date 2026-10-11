@@ -4,6 +4,7 @@ Spuštění: dvojklik na "Spravovat videa.command" v hlavní složce webu.
 Běží jen na tomhle počítači (127.0.0.1). Složku sprava/ na hosting nenahrávej.
 """
 
+import datetime
 import functools
 import http.server
 import json
@@ -80,6 +81,7 @@ def build_video(data, existing):
         "featured": False,
         "top": top,
         "comment": text["comment"],
+        "added": datetime.datetime.now().isoformat(timespec="seconds"),
     }, None
 
 
