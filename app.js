@@ -135,7 +135,7 @@ function bindPlayer() {
       event.preventDefault();
       const href = encodeURIComponent(reel.dataset.reel);
       reel.classList.add("is-playing");
-      reel.innerHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${href}&show_text=false&autoplay=true" allow="autoplay; encrypted-media; picture-in-picture; clipboard-write" allowfullscreen title="Facebook reel"></iframe>`;
+      reel.innerHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${href}&show_text=false&autoplay=true&mute=0" allow="autoplay; encrypted-media; picture-in-picture; clipboard-write" allowfullscreen title="Facebook reel"></iframe>`;
       return;
     }
     const link = event.target.closest("[data-play]");
