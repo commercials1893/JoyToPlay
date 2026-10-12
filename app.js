@@ -27,14 +27,27 @@ function youtubeId(url, id) {
   }
 }
 
-function cardHTML(video) {
+// Facebook nedává stálou adresu náhledu, reel má místo obrázku dlaždici s názvem.
+function thumbHTML(video) {
+  if (video.facebook) {
+    return `
+      <a class="thumb thumb-reel" href="${video.facebook}" data-reel="${video.facebook}" aria-label="Přehrát ${video.song}">
+        <span class="reel-kind">Reel · Facebook</span>
+        <span class="reel-song">${video.song}</span>
+        <span class="play">Přehrát reel</span>
+      </a>`;
+  }
   const id = youtubeId(video.youtube, video.id);
   return `
-    <article class="video-card" data-cats="${video.categories.join(" ")}" data-top="${video.top}">
       <a class="thumb" href="${video.youtube}" data-play="${id}" aria-label="Přehrát ${video.song}">
         <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="">
         <span class="play">Přehrát na YouTube</span>
-      </a>
+      </a>`;
+}
+
+function cardHTML(video) {
+  return `
+    <article class="video-card" data-cats="${video.categories.join(" ")}" data-top="${video.top}">${thumbHTML(video)}
       <div class="card-body">
         <h3>${video.song}</h3>
         <p class="by">${video.channel}</p>
@@ -117,6 +130,14 @@ function bindFilters(videos) {
 
 function bindPlayer() {
   document.getElementById("videos").addEventListener("click", (event) => {
+    const reel = event.target.closest("[data-reel]");
+    if (reel) {
+      event.preventDefault();
+      const href = encodeURIComponent(reel.dataset.reel);
+      reel.classList.add("is-playing");
+      reel.innerHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${href}&show_text=false&autoplay=true" allow="autoplay; encrypted-media; picture-in-picture; clipboard-write" allowfullscreen title="Facebook reel"></iframe>`;
+      return;
+    }
     const link = event.target.closest("[data-play]");
     if (!link) return;
     event.preventDefault();

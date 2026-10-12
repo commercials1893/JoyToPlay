@@ -257,5 +257,91 @@
     "top": false,
     "comment": "Jednoduché akordy, krásné intro a ten song zní prostě dobře.",
     "added": "2026-10-11T12:42:39"
+  },
+  {
+    "id": "fb2490034381463443",
+    "title": "Minuta a hraješ",
+    "song": "Akordový postup za minutu",
+    "facebook": "https://www.facebook.com/reel/2490034381463443",
+    "channel": "Janers Arias",
+    "difficulty": 2,
+    "time": "20 minut",
+    "categories": [],
+    "featured": false,
+    "top": false,
+    "comment": "Krátký akordový postup, který zní hotově. Dobré na rozehrání.",
+    "added": "2026-10-12T22:52:16"
+  },
+  {
+    "id": "fb1744422743264136",
+    "title": "Zná to každý",
+    "song": "Hey Jude",
+    "facebook": "https://www.facebook.com/reel/1744422743264136",
+    "channel": "Casual Guitar Chord",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [],
+    "featured": false,
+    "top": false,
+    "comment": "Pár základních akordů a písnička, kterou si s tebou zazpívá celý stůl.",
+    "added": "2026-10-12T22:52:16"
+  },
+  {
+    "id": "fb2082636789174102",
+    "title": "Rock i na akustiku",
+    "song": "You Shook Me All Night Long",
+    "facebook": "https://www.facebook.com/reel/2082636789174102",
+    "channel": "Henry Olsen Guitar",
+    "difficulty": 3,
+    "time": "1 večer",
+    "categories": [],
+    "featured": false,
+    "top": false,
+    "comment": "Riff z otevřených akordů, který poznáš po dvou taktech.",
+    "added": "2026-10-12T22:52:16"
+  },
+  {
+    "id": "fb1890463148214673",
+    "title": "Folková klasika",
+    "song": "Heart of Gold",
+    "facebook": "https://www.facebook.com/reel/1890463148214673",
+    "channel": "Guitar Coaching Online",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [],
+    "featured": false,
+    "top": false,
+    "comment": "Pár akordů a klidný rytmus. Krásně to zní jen s jednou kytarou.",
+    "added": "2026-10-12T22:52:16"
+  },
+  {
+    "id": "fb704821548983334",
+    "title": "Celé je to o pravé ruce",
+    "song": "Linger",
+    "facebook": "https://www.facebook.com/reel/704821548983334",
+    "channel": "Leve Violão",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [],
+    "featured": false,
+    "top": false,
+    "comment": "Akordy se točí pořád dokola, kouzlo dělá rytmus. Video ukazuje hlavně pravou ruku.",
+    "added": "2026-10-12T22:52:16"
+  },
+  {
+    "id": "fb793099467199899",
+    "title": "Tři akordy a jede to",
+    "song": "Bad Moon Rising",
+    "facebook": "https://www.facebook.com/reel/793099467199899",
+    "channel": "Leve Violão",
+    "difficulty": 1,
+    "time": "20 minut",
+    "categories": [
+      "three"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Svižný rytmus a písnička, která se hodí k ohni.",
+    "added": "2026-10-12T22:52:16"
   }
 ]

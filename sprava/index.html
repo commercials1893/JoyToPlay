@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css?v=17">
+  <link rel="stylesheet" href="../styles.css?v=18">
   <style>
     [hidden] { display: none !important; }
     .admin { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
@@ -45,7 +45,7 @@
 
     <section class="about-card">
       <form class="form" id="add-form">
-        <label>Odkaz na YouTube
+        <label>Odkaz na YouTube nebo Facebook reel
           <input name="youtube" type="url" required placeholder="https://www.youtube.com/watch?v=…">
         </label>
         <p class="tip" id="tip" hidden></p>
@@ -159,11 +159,14 @@
       const info = await res.json();
       if (!res.ok) return say(info.error, false);
       msg.hidden = true;
-      const watch = "https://www.youtube.com/watch?v=" + info.id;
-      document.getElementById("preview-img").src = `https://i.ytimg.com/vi/${info.id}/mqdefault.jpg`;
+      const reel = info.source === "facebook";
+      const watch = info.link;
+      const img = document.getElementById("preview-img");
+      img.hidden = reel;
+      if (!reel) img.src = `https://i.ytimg.com/vi/${info.id}/mqdefault.jpg`;
       document.getElementById("preview-link").href = watch;
       document.getElementById("preview-open").href = watch;
-      document.getElementById("preview-title").textContent = info.title || "Název se nepodařilo načíst";
+      document.getElementById("preview-title").textContent = reel ? "Reel na Facebooku. Píseň a autora vyplň ručně." : info.title || "Název se nepodařilo načíst";
       document.getElementById("preview-channel").textContent = info.channel;
       preview.hidden = false;
       if (info.channel && !form.channel.value) form.channel.value = info.channel;
@@ -177,7 +180,7 @@
         const item = document.createElement("div");
         item.className = "list-item";
         const img = document.createElement("img");
-        img.src = `https://i.ytimg.com/vi/${video.id}/default.jpg`;
+        if (video.youtube) img.src = `https://i.ytimg.com/vi/${video.id}/default.jpg`;
         img.alt = "";
         const text = document.createElement("div");
         const title = document.createElement("strong");

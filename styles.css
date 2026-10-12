@@ -327,6 +327,40 @@ a {
   border: 0;
 }
 
+.thumb-reel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px;
+  background: #1d1d1f;
+  color: #fff;
+  text-decoration: none;
+}
+
+.reel-kind {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.reel-song {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* Reely jsou na výšku, přehrávač proto dostane víc místa než náhled. */
+.thumb-reel.is-playing {
+  aspect-ratio: auto;
+  height: 600px;
+  padding: 0;
+}
+
 .play {
   position: absolute;
   inset: auto auto 16px 16px;

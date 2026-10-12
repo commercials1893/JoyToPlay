@@ -41,6 +41,27 @@ def youtube_id(url):
     return candidate if ID_RE.match(candidate) else ""
 
 
+def facebook_reel_id(url):
+    parsed = urllib.parse.urlparse(url.strip())
+    host = parsed.netloc.lower()
+    match = re.match(r"^/reel/(\d+)/?$", parsed.path)
+    return match.group(1) if match and (host == "facebook.com" or host.endswith(".facebook.com")) else ""
+
+
+def video_source(url):
+    """Vrátí (id, pole, čistý odkaz) pro YouTube video nebo Facebook reel, jinak prázdné id."""
+    vid = youtube_id(url)
+    if vid:
+        return vid, "youtube", f"https://www.youtube.com/watch?v={vid}"
+    reel = facebook_reel_id(url)
+    if reel:
+        return f"fb{reel}", "facebook", f"https://www.facebook.com/reel/{reel}"
+    return "", "", ""
+
+
+BAD_LINK = "Tohle nevypadá jako odkaz na YouTube video ani Facebook reel (facebook.com/reel/…)."
+
+
 def read_json(path):
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
 
@@ -81,9 +102,9 @@ def build_song(data, existing):
 
 def build_video(data, existing):
     """Ověří data z formuláře a vrátí (video, chyba)."""
-    vid = youtube_id(str(data.get("youtube", "")))
+    vid, field, link = video_source(str(data.get("youtube", "")))
     if not vid:
-        return None, "Tohle nevypadá jako odkaz na YouTube video."
+        return None, BAD_LINK
     if any(v.get("id") == vid for v in existing):
         return None, "Tohle video už v seznamu je."
     text = {k: str(data.get(k, "")).strip() for k in ("title", "song", "channel", "time", "comment")}
@@ -103,7 +124,7 @@ def build_video(data, existing):
         "id": vid,
         "title": text["title"],
         "song": text["song"],
-        "youtube": f"https://www.youtube.com/watch?v={vid}",
+        field: link,
         "channel": text["channel"],
         "difficulty": difficulty,
         "time": text["time"],
@@ -140,10 +161,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if parsed.path != "/api/info":
             return super().do_GET()
         url = urllib.parse.parse_qs(parsed.query).get("url", [""])[0]
-        vid = youtube_id(url)
+        vid, field, link = video_source(url)
         if not vid:
-            return self.send_json(400, {"error": "Tohle nevypadá jako odkaz na YouTube video."})
-        info = {"id": vid, "title": "", "channel": "", "exists": any(v.get("id") == vid for v in read_videos())}
+            return self.send_json(400, {"error": BAD_LINK})
+        info = {"id": vid, "source": field, "link": link, "title": "", "channel": "",
+                "exists": any(v.get("id") == vid for v in read_videos())}
+        if field == "facebook":
+            return self.send_json(200, info)  # Facebook název ani autora nevydá, vyplní se ručně
         try:
             oembed = "https://www.youtube.com/oembed?format=json&url=" + urllib.parse.quote(
                 f"https://www.youtube.com/watch?v={vid}", safe=""
