@@ -80,33 +80,65 @@ function newestFirst(videos) {
     .map(({ video }) => video);
 }
 
-// Rychlý výběr: štítky s písničkami z právě vybrané sekce. Klik ukáže jen to video, druhý klik vrátí celou sekci.
-function renderPicks(videos, filter, shown, picked) {
+// Rychlý výběr písničky v právě vybrané sekci: písmena a po kliknutí na některé štítky písniček od něj.
+// Klik na písničku ukáže jen její video, druhý klik vrátí celou sekci. Krátké sekce se obejdou bez písmen.
+const LETTERS_FROM = 10;
+
+function renderPicks(videos, filter, shown, picked, letter) {
+  const lettersRoot = document.getElementById("song-letters");
   const root = document.getElementById("song-picks");
+  const initial = (video) => plain(video.song)[0].toUpperCase();
   const sorted = [...shown].sort((a, b) => a.song.localeCompare(b.song, "cs"));
-  root.replaceChildren(
-    ...sorted.map((video) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "filter" + (video.id === picked ? " is-on" : "");
-      chip.textContent = video.song;
-      chip.addEventListener("click", () => render(videos, filter, video.id === picked ? null : video.id));
-      return chip;
+  const useLetters = sorted.length > LETTERS_FROM;
+  const letters = [...new Set(sorted.map(initial))];
+  const current = letters.includes(letter) ? letter : null;
+
+  lettersRoot.hidden = !useLetters;
+  lettersRoot.replaceChildren(
+    ...letters.map((value) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = value === current ? "is-on" : "";
+      button.textContent = value;
+      button.addEventListener("click", () => render(videos, filter, null, value === current ? null : value));
+      return button;
     }),
   );
-  root.hidden = sorted.length < 2;
+  root.hidden = sorted.length < 2 || (useLetters && !current);
+  root.replaceChildren(
+    ...sorted
+      .filter((video) => !useLetters || initial(video) === current)
+      .map((video) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "filter" + (video.id === picked ? " is-on" : "");
+        chip.textContent = video.song;
+        chip.addEventListener("click", () => render(videos, filter, video.id === picked ? null : video.id, current));
+        return chip;
+      }),
+  );
 }
 
-function render(videos, filter, picked = null) {
+// Videa se ukazují po deseti, další přidá tlačítko pod nimi. Změna sekce začíná zase od začátku.
+const PAGE_SIZE = 10;
+let shown = { filter: null, limit: PAGE_SIZE, last: null };
+
+function render(videos, filter, picked = null, letter = null) {
   const root = document.getElementById("videos");
+  const more = document.getElementById("videos-more");
+  if (filter !== shown.filter) shown = { filter, limit: PAGE_SIZE };
+  shown.last = [videos, filter, picked, letter];
   const source = filter === "latest" ? newestFirst(videos) : videos;
   const filtered = source.filter((video) => {
     if (filter === "all" || filter === "latest") return true;
     if (filter === "top") return video.top;
     return video.categories.includes(filter);
   });
-  renderPicks(videos, filter, filtered, picked);
-  const cards = picked ? filtered.filter((video) => video.id === picked) : filtered;
+  renderPicks(videos, filter, filtered, picked, letter);
+  const cards = picked ? filtered.filter((video) => video.id === picked) : filtered.slice(0, shown.limit);
+  const rest = picked ? 0 : filtered.length - cards.length;
+  more.hidden = rest <= 0;
+  more.textContent = `Zobrazit další (${rest})`;
   root.innerHTML = cards.length
     ? cards.map(cardHTML).join("")
     : `<p class="empty">V téhle sekci zatím nic není. TJ sem přidá jen to, co opravdu stojí za čas.</p>`;
@@ -343,6 +375,10 @@ async function init() {
   render(videos, "latest");
   bindFilters(videos);
   bindPlayer();
+  document.getElementById("videos-more").addEventListener("click", () => {
+    shown.limit += PAGE_SIZE;
+    render(...shown.last);
+  });
 }
 
 init();

@@ -290,6 +290,31 @@ a {
   margin-bottom: 14px;
 }
 
+.letters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.letters button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--bg);
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.letters button.is-on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
 .song-picks .filter {
   background: var(--bg);
   border-color: var(--line);
@@ -310,6 +335,11 @@ a {
 
 .video-card {
   overflow: hidden;
+}
+
+#videos-more {
+  display: flex;
+  margin: 28px auto 0;
 }
 
 .thumb {
