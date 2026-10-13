@@ -27,11 +27,22 @@ function youtubeId(url, id) {
   }
 }
 
-// Facebook nedává stálou adresu náhledu, reel má místo obrázku dlaždici s názvem.
+// Barvy dlaždic reelů: [tmavé pozadí, světlý akcent pro kytaru a popisek].
+const REEL_PALETTES = [
+  ["#2c1245", "#c58bff"], ["#40101a", "#ff8a8a"], ["#0f2247", "#7ab8ff"], ["#0f3327", "#7fe0a8"], ["#3a2a05", "#f3cf5b"],
+  ["#3b1d12", "#ffa66b"], ["#062f36", "#5fd6e0"], ["#3d0f33", "#ff8fd0"], ["#1b1f3d", "#9aa5ff"], ["#2a2f10", "#cfe06a"],
+];
+const REEL_GUITAR = `<svg viewBox="0 0 100 160" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(28 50 80)"><path d="M50 62 C30 62 24 76 28 88 C30 95 22 98 18 110 C12 130 28 152 50 152 C72 152 88 130 82 110 C78 98 70 95 72 88 C76 76 70 62 50 62 Z"/><path d="M45 62 V20 M55 62 V20"/><rect x="40" y="0" width="20" height="20" rx="4"/><circle cx="50" cy="98" r="9"/><path d="M38 130 H62"/></g></svg>`;
+// Pořadí reelu v seznamu určuje barvu, aby se sousední reely nelišily jen názvem.
+const reelColor = new Map();
+
+// Facebook nedává stálou adresu náhledu, reel má místo obrázku barevnou dlaždici s kytarou.
 function thumbHTML(video) {
   if (video.facebook) {
+    const [dark, accent] = REEL_PALETTES[(reelColor.get(video.id) || 0) % REEL_PALETTES.length];
     return `
-      <a class="thumb thumb-reel" href="${video.facebook}" data-reel="${video.facebook}" aria-label="Přehrát ${video.song}">
+      <a class="thumb thumb-reel${video.song.length > 18 ? " is-long" : ""}" style="--reel-dark:${dark};--reel-accent:${accent}" href="${video.facebook}" data-reel="${video.facebook}" aria-label="Přehrát ${video.song}">
+        ${REEL_GUITAR}
         <span class="reel-kind">Reel · Facebook</span>
         <span class="reel-song">${video.song}</span>
         <span class="play">Přehrát reel</span>
@@ -328,6 +339,7 @@ async function init() {
       "<p class=\"empty\">Videa se nepodařilo načíst. Otevři web přes malý lokální server, ne jen jako soubor.</p>";
     return;
   }
+  videos.filter((video) => video.facebook).forEach((video, index) => reelColor.set(video.id, index));
   render(videos, "latest");
   bindFilters(videos);
   bindPlayer();
