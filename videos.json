@@ -343,5 +343,49 @@
     "top": false,
     "comment": "Svižný rytmus a písnička, která se hodí k ohni.",
     "added": "2026-10-12T22:52:16"
+  },
+  {
+    "id": "R2y_nuoGpmg",
+    "title": "Jedna kytara a písnička, která zní hotově",
+    "song": "Redemption Song",
+    "youtube": "https://www.youtube.com/watch?v=R2y_nuoGpmg",
+    "channel": "Marty Music",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [],
+    "featured": false,
+    "top": true,
+    "comment": "Žádný velký rytmus ani efekty, jen kytara a melodie. Ideální na klidný večer.",
+    "added": "2026-10-20T23:32:18"
+  },
+  {
+    "id": "UioPoWP2X_U",
+    "title": "Písnička, kterou zná každý",
+    "song": "Take Me Home, Country Roads",
+    "youtube": "https://www.youtube.com/watch?v=UioPoWP2X_U",
+    "channel": "Relax and Learn Guitar",
+    "difficulty": 2,
+    "time": "1 večer",
+    "categories": [
+      "start"
+    ],
+    "featured": false,
+    "top": false,
+    "comment": "Jednoduchý country rytmus, který pak použiješ i u dalších písniček. Stačí pár základních akordů.",
+    "added": "2026-10-20T23:33:55"
+  },
+  {
+    "id": "7FurwLN6Hmc",
+    "title": "Perfektně to zní",
+    "song": "4 písně na akustiku",
+    "youtube": "https://www.youtube.com/watch?v=7FurwLN6Hmc",
+    "channel": "Relax and Learn Guitar",
+    "difficulty": 2,
+    "time": "3 večery",
+    "categories": [],
+    "featured": false,
+    "top": true,
+    "comment": "Wish You Were Here, Imagine, The Joker a Tennessee Whiskey v jednom videu. Čtyři písničky, které zní skvěle a dají se zvládnout.",
+    "added": "2026-10-20T23:39:44"
   }
 ]
