@@ -329,11 +329,21 @@ input[type="checkbox"],input[type="radio"]{width:auto;padding:0}
 .logo-pick{height:36px;width:36px;flex:none;fill:currentColor}
 .logo-pick text{fill:var(--bg);font-family:Caveat,"Bradley Hand",cursive;font-size:27px;font-weight:700}
 
-/* úvod */
-.hero-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.hero-tile{width:100%;margin-top:24px;height:clamp(260px,44vw,540px);background:var(--photo);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden;display:grid;place-items:center}
-.hero-tile img{width:min(80%,860px);height:auto;transform:rotate(-16deg);mix-blend-mode:multiply}
-@media (max-width:700px){.hero-tile img{width:104%;max-width:none;transform:rotate(-10deg)}}
+/* úvod: šedá dlaždice, text vlevo a nakloněná kytara vpravo */
+.hero-banner{padding-block:48px 0}
+.hero-panel{--ink:#1D1D1F;--muted:#6E6E73;--sunk:#F2F2F5;--surface:#FFFFFF;position:relative;overflow:hidden;display:flex;align-items:center;min-height:min(640px,calc(100vh - 140px));padding:72px 64px;background:var(--photo);color:var(--ink);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.hero-text{position:relative;z-index:1;max-width:42%;display:grid;gap:16px;justify-items:start}
+.hero-text h1{font-size:clamp(48px,6.4vw,92px);line-height:1;letter-spacing:-.045em}
+.motto{font-family:var(--f-display);font-size:clamp(22px,2.6vw,32px);font-weight:500;letter-spacing:-.02em;line-height:1.2}
+.intro{font-size:18px;line-height:1.5;color:var(--muted);max-width:34rem}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.hero-panel .btn-quiet{background:var(--sunk);box-shadow:none}
+.hero-guitar{position:absolute;right:-3%;top:50%;width:56%;transform:translateY(-50%) rotate(-24deg);mix-blend-mode:multiply}
+@media (max-width:860px){
+  .hero-panel{flex-direction:column;align-items:flex-start;min-height:0;padding:40px 28px}
+  .hero-text{max-width:none}
+  .hero-guitar{position:static;width:100%;transform:rotate(-12deg);margin:40px 0 32px}
+}
 
 /* karty se sliby a sekcemi */
 .track p{font-size:15.5px;line-height:1.4;color:var(--muted)}
