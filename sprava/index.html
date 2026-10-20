@@ -2,48 +2,48 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
   <title>Správa videí — Joy To Play</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css?v=22">
+  <link rel="stylesheet" href="../styles.css?v=24">
   <style>
-    [hidden] { display: none !important; }
-    .admin { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
-    .admin h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin-bottom: 6px; }
-    .admin h2 { font-size: 1.5rem; margin-bottom: 14px; }
-    .admin .about-card { margin-top: 26px; }
-    .admin label { display: grid; gap: 6px; font-weight: 500; }
+    .admin { max-width: 760px; margin: 0 auto; padding: 56px 0 80px; display: grid; gap: 16px; }
+    .admin h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.08; letter-spacing: -.035em; }
+    .admin h2 { font-size: 24px; letter-spacing: -.02em; }
+    .admin .lead { max-width: none; font-size: 18px; }
+    .admin .lead a { color: var(--accent); }
+    .admin label { display: grid; gap: 6px; font-weight: 500; font-size: 15px; }
     .admin label small, .hint { font-weight: 400; color: var(--muted); }
-    .admin select { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 12px 14px; font: inherit; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .checks { display: flex; flex-wrap: wrap; gap: 8px; }
-    .checks label { display: inline-flex; grid-auto-flow: column; align-items: center; gap: 6px; font-weight: 400; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 7px 13px; cursor: pointer; }
-    .checks input { width: auto; }
-    .preview { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .checks label { display: inline-flex; grid-auto-flow: column; align-items: center; gap: 6px; font-weight: 400; background: var(--sunk); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+    .preview { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: center; padding: 14px; border-radius: var(--r); background: var(--sunk); }
     .preview img { width: 100%; border-radius: 10px; display: block; }
-    .tip { border-left: 3px solid var(--wood); padding: 4px 0 4px 14px; color: var(--ink-soft); }
-    .msg { padding: 12px 14px; border-radius: 14px; }
-    .msg.ok { background: #e8f1ea; color: #2f5a3d; }
-    .msg.err { background: #f7e6e3; color: #8a2f25; }
+    .preview a { color: var(--accent); }
+    .tip { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; color: var(--muted); }
+    .msg { padding: 12px 14px; border-radius: 12px; font-size: 15px; }
+    .msg.ok { background: var(--ok-soft); color: var(--ok); }
+    .msg.err { background: var(--risk-soft); color: var(--risk); }
     .list { display: grid; gap: 10px; }
     .list-item { display: grid; grid-template-columns: 96px 1fr auto; gap: 14px; align-items: center; }
     .list-item img { width: 96px; border-radius: 8px; display: block; }
     .list-item strong { display: block; }
-    .list-item span { color: var(--muted); font-size: 0.92rem; }
-    .remove { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 12px; font: inherit; color: var(--muted); cursor: pointer; }
-    .remove:hover { color: #8a2f25; border-color: #8a2f25; }
+    .list-item span { color: var(--muted); font-size: 14.5px; }
+    .remove { border: 0; background: var(--sunk); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 14px; color: var(--muted); cursor: pointer; }
+    .remove:hover { color: var(--risk); background: var(--risk-soft); }
     @media (max-width: 600px) { .row, .preview { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <main class="admin">
-    <p class="kicker">Joy To Play · správa</p>
+    <p class="eyebrow">Joy To Play · správa</p>
     <h1>Přidat video</h1>
     <p class="lead">Vlož odkaz, podívej se na video, napiš svůj komentář. Po kliknutí na OK je hned na webu. <a href="../">Otevřít web</a></p>
 
-    <section class="about-card">
+    <div class="tile">
       <form class="form" id="add-form">
         <label>Odkaz na YouTube nebo Facebook reel
           <input name="youtube" type="url" required placeholder="https://www.youtube.com/watch?v=…">
@@ -101,18 +101,18 @@
           <textarea name="comment" rows="3" required></textarea>
         </label>
         <p class="msg" id="msg" hidden></p>
-        <button class="btn btn-dark" type="submit">OK, přidat na web</button>
+        <button class="btn btn-primary" type="submit">OK, přidat na web</button>
       </form>
-    </section>
+    </div>
 
-    <section class="about-card">
+    <div class="tile">
       <h2>Videa na webu <span class="hint" id="count"></span></h2>
       <div class="list" id="list"></div>
-    </section>
-    <h1 style="margin-top:64px">Zpěvník</h1>
+    </div>
+    <h1 style="margin-top:48px">Zpěvník</h1>
     <p class="lead">Odkazy na akordy z Ultimate Guitar. Interpret a název se zkusí doplnit z odkazu, zkontroluj je.</p>
 
-    <section class="about-card">
+    <div class="tile">
       <form class="form" id="song-form">
         <label>Odkaz na Ultimate Guitar
           <input name="url" type="url" required placeholder="https://tabs.ultimate-guitar.com/tab/…">
@@ -129,14 +129,14 @@
           <input name="note" type="text">
         </label>
         <p class="msg" id="song-msg" hidden></p>
-        <button class="btn btn-dark" type="submit">OK, přidat do zpěvníku</button>
+        <button class="btn btn-primary" type="submit">OK, přidat do zpěvníku</button>
       </form>
-    </section>
+    </div>
 
-    <section class="about-card">
+    <div class="tile">
       <h2>Písničky ve zpěvníku <span class="hint" id="song-count"></span></h2>
       <div class="list" id="song-list"></div>
-    </section>
+    </div>
   </main>
 
   <script>

@@ -16,7 +16,7 @@ const FORMSPREE_URL = "https://formspree.io/f/xnpjvlyj";
 
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 
-const bars = (n) => Array.from({ length: 5 }, (_, i) => `<i${i < n ? ' class="on"' : ""}></i>`).join("");
+const lvl = (n) => Array.from({ length: 5 }, (_, i) => `<i${i < n ? ' class="on"' : ""}></i>`).join("");
 
 function youtubeId(url, id) {
   if (id) return id;
@@ -63,7 +63,7 @@ function cardHTML(video) {
         <h3>${video.song}</h3>
         <p class="by">${video.channel}</p>
         <div class="facts">
-          <span><span class="bars" aria-hidden="true">${bars(video.difficulty)}</span>Obtížnost <b>${video.difficulty}/5 · ${LEVELS[video.difficulty]}</b></span>
+          <span><span class="lvl" aria-hidden="true">${lvl(video.difficulty)}</span>Obtížnost <b>${video.difficulty}/5 · ${LEVELS[video.difficulty]}</b></span>
           <span>Čas <b>${video.time}</b></span>
         </div>
         <p class="comment"><strong>${video.title}</strong><span>${video.comment}</span></p>
@@ -111,7 +111,8 @@ function renderPicks(videos, filter, shown, picked, letter) {
       .map((video) => {
         const chip = document.createElement("button");
         chip.type = "button";
-        chip.className = "filter" + (video.id === picked ? " is-on" : "");
+        chip.className = "chip";
+        chip.setAttribute("aria-pressed", String(video.id === picked));
         chip.textContent = video.song;
         chip.addEventListener("click", () => render(videos, filter, video.id === picked ? null : video.id, current));
         return chip;
@@ -147,12 +148,11 @@ function render(videos, filter, picked = null, letter = null) {
 function bindFilters(videos) {
   document.querySelectorAll("[data-filter]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll("[data-filter]").forEach((el) => el.classList.remove("is-on"));
-      btn.classList.add("is-on");
+      document.querySelectorAll("[data-filter]").forEach((el) => el.setAttribute("aria-selected", String(el === btn)));
       const filter = btn.dataset.filter;
       render(videos, filter);
       history.replaceState(null, "", `#videa`);
-      document.querySelectorAll(".nav-links a").forEach((a) => {
+      document.querySelectorAll(".topnav a").forEach((a) => {
         a.classList.toggle("is-active", a.getAttribute("href") === "#videa");
       });
     });
@@ -189,15 +189,6 @@ function bindPlayer() {
   });
 }
 
-function bindNav() {
-  const btn = document.querySelector(".menu-btn");
-  const links = document.querySelector(".nav-links");
-  btn.addEventListener("click", () => links.classList.toggle("is-open"));
-  links.querySelectorAll("a").forEach((a) => {
-    a.addEventListener("click", () => links.classList.remove("is-open"));
-  });
-}
-
 function bindForm() {
   const section = document.getElementById("doporuc");
   const form = document.getElementById("recommend-form");
@@ -205,12 +196,12 @@ function bindForm() {
   if (!FORMSPREE_URL) {
     // Bez adresy formuláře by tip nikam nedošel, sekci proto neukazujeme.
     section.hidden = true;
-    document.querySelector('.nav-links a[href="#doporuc"]').parentElement.hidden = true;
+    document.querySelector('.topnav a[href="#doporuc"]').hidden = true;
     return;
   }
   const say = (text, ok) => {
     note.textContent = text;
-    note.style.color = ok ? "#2f6b45" : "#a1352a";
+    note.style.color = ok ? "var(--ok)" : "var(--risk)";
     note.hidden = false;
   };
   form.addEventListener("submit", async (event) => {
@@ -288,7 +279,7 @@ async function initSongs() {
     /* zpěvník je volitelný */
   }
   if (!songs.length) {
-    document.querySelector('.nav-links a[href="#zpevnik"]').parentElement.hidden = true;
+    document.querySelector('.topnav a[href="#zpevnik"]').hidden = true;
     return;
   }
   const root = document.getElementById("songs");
@@ -319,7 +310,7 @@ async function initSongs() {
   let selected = null;
   const select = (chip) => {
     selected = chip;
-    chips.querySelectorAll(".filter").forEach((el) => el.classList.toggle("is-on", el === chip));
+    chips.querySelectorAll(".chip").forEach((el) => el.setAttribute("aria-pressed", String(el === chip)));
     if (!chip) return;
     search.value = "";
     if (chip.dataset.artist) showArtist(chip.dataset.artist);
@@ -328,7 +319,8 @@ async function initSongs() {
   const addChip = (label, count, artist) => {
     const chip = document.createElement("button");
     chip.type = "button";
-    chip.className = "filter";
+    chip.className = "chip";
+    chip.setAttribute("aria-pressed", "false");
     chip.textContent = label;
     if (artist) chip.dataset.artist = artist;
     const number = document.createElement("span");
@@ -362,7 +354,6 @@ async function initSongs() {
 }
 
 async function init() {
-  bindNav();
   bindForm();
   initSongs();
   const videos = await loadVideos();
