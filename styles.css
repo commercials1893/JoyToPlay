@@ -47,7 +47,19 @@ section{padding-block:112px 0;display:grid;gap:40px}
 .topnav b{font-size:17px;font-weight:600;white-space:nowrap;margin-right:auto}
 .topnav a{font-size:12.5px;color:var(--ink);opacity:.8;text-decoration:none;white-space:nowrap;letter-spacing:0}
 .topnav a:hover{opacity:1;color:var(--accent)}
-@media (max-width:760px){.topnav a{display:none}}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-toggle{display:none;align-items:center;justify-content:center;width:40px;height:40px;margin-right:-8px;padding:0;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.nav-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.nav-toggle path{transform-origin:12px 12px;transition:transform .2s ease}
+.topnav.is-open .nav-toggle path:first-child{transform:translateY(4px) rotate(45deg)}
+.topnav.is-open .nav-toggle path:last-child{transform:translateY(-4px) rotate(-45deg)}
+@media (max-width:760px){
+  .nav-toggle{display:inline-flex}
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;padding:4px 20px 12px;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .topnav.is-open .nav-links{display:grid;gap:0}
+  .nav-links a{font-size:17px;padding:12px 0;border-bottom:1px solid var(--line);opacity:1}
+  .nav-links a:last-child{border-bottom:0}
+}
 
 /* HERO */
 .hero{padding-block:96px 16px;display:grid;gap:32px;justify-items:center;text-align:center}
@@ -442,3 +454,4 @@ a.track:hover{transform:scale(1.015)}
 
 /* patička */
 footer{margin-top:64px}
+.artist-chips .chip-more{background:transparent;box-shadow:none;color:var(--accent);font-weight:500}

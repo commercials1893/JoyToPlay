@@ -11,6 +11,9 @@ const CATEGORIES = {
 
 const FALLBACK_VIDEOS = [];
 
+// Kolik interpretů ve zpěvníku je vidět bez rozbalení.
+const TOP_ARTISTS = 6;
+
 // Adresa formuláře z Formspree (https://formspree.io/f/…). Prázdná = sekce „Doporuč video" se skryje.
 const FORMSPREE_URL = "https://formspree.io/f/xnpjvlyj";
 
@@ -335,7 +338,23 @@ async function initSongs() {
   const all = addChip("Vše", songs.length);
   const byCount = [...groups].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], "cs"));
   const artistChips = byCount.map(([artist, list]) => addChip(artist, list.length, artist));
-  const initial = artistChips[0] || all;
+
+  // Na první pohled jen nejčastější interpreti, ostatní schová tlačítko.
+  const rest = artistChips.slice(TOP_ARTISTS);
+  if (rest.length) {
+    rest.forEach((chip) => (chip.hidden = true));
+    const more = document.createElement("button");
+    more.type = "button";
+    more.className = "chip chip-more";
+    more.textContent = `Všichni interpreti (${artistChips.length})`;
+    more.addEventListener("click", () => {
+      rest.forEach((chip) => (chip.hidden = false));
+      more.remove();
+    });
+    chips.append(more);
+  }
+
+  const initial = all;
   select(initial);
 
   // Hledání jde přes celý zpěvník; po smazání se vrátí naposledy vybraný interpret.
@@ -353,7 +372,22 @@ async function initSongs() {
   });
 }
 
+// Mobilní menu: na úzké obrazovce jsou odkazy schované pod tlačítkem.
+function bindNav() {
+  const nav = document.querySelector(".topnav");
+  const toggle = document.getElementById("nav-toggle");
+  const setOpen = (open) => {
+    nav.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+  };
+  toggle.addEventListener("click", () => setOpen(!nav.classList.contains("is-open")));
+  document.getElementById("nav-links").addEventListener("click", (event) => {
+    if (event.target.closest("a")) setOpen(false);
+  });
+}
+
 async function init() {
+  bindNav();
   bindForm();
   initSongs();
   const videos = await loadVideos();

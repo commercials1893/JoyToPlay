@@ -35,12 +35,17 @@
           <span>Joy To Play</span>
         </a>
       </b>
-      <a href="#videa">Videa</a>
-      <a href="#zpevnik">Zpěvník</a>
-      <a href="#sekce">Sekce</a>
-      <a href="#kanaly">Kanály</a>
-      <a href="#tj">O mně</a>
-      <a href="#doporuc">Doporuč</a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16"/><path d="M4 16h16"/></svg>
+      </button>
+      <div class="nav-links" id="nav-links">
+        <a href="#videa">Videa</a>
+        <a href="#zpevnik">Zpěvník</a>
+        <a href="#sekce">Sekce</a>
+        <a href="#kanaly">Kanály</a>
+        <a href="#tj">O mně</a>
+        <a href="#doporuc">Doporuč</a>
+      </div>
     </div>
   </nav>
 
@@ -53,7 +58,7 @@
           <p class="motto">Nauč se málo. Zahraj hodně.</p>
           <p class="intro">Nejsem kytarová škola. Jen sdílím videa, podle kterých se dá zahrát něco, co je celkem snadné a hezky to zní. Pro lidi, kteří mají práci, rodinu a na kytaru pár volných večerů.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#katalog">Začni dnes</a>
+            <a class="btn btn-primary" href="#katalog" data-jump="start">Začni dnes</a>
             <a class="btn btn-quiet" href="#tj">O mně</a>
           </div>
         </div>
@@ -224,7 +229,7 @@
       </div>
       <div class="tile form-tile">
         <form class="form" id="recommend-form">
-          <input name="url" type="url" required placeholder="Odkaz na YouTube">
+          <input name="url" type="url" required placeholder="Odkaz na video (YouTube, Facebook)" aria-label="Odkaz na video">
           <input name="why" type="text" required placeholder="Proč to stojí za čas?">
           <input name="_gotcha" type="text" tabindex="-1" autocomplete="off" hidden>
           <button class="btn btn-primary" type="submit">Poslat TJ</button>
