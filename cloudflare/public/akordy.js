@@ -33,6 +33,8 @@
   const cache = new Map();
   function audio() {
     if (!ctx) {
+      // iPhone: bez tohohle Web Audio mlčí, když je zapnutý tichý režim
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
       ctx = new (window.AudioContext || window.webkitAudioContext)();
       master = ctx.createGain();
       master.gain.value = 0.55;
@@ -52,7 +54,9 @@
     for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
     for (let k = 0; k < 2; k++) for (let i = 1; i < n; i++) d[i] = (d[i] + d[i - 1]) / 2;
     const decay = 0.9965 + Math.min(0.0025, (60 - midi) * 0.0001);
-    for (let i = n; i < len; i++) d[i] = decay * 0.5 * (d[i - n] + d[i - n - 1]);
+    // d[i - n - 1] musí existovat, jinak by d[-1] (undefined) udělalo z celého zvuku NaN a nehrálo by nic
+    d[n] = decay * d[0];
+    for (let i = n + 1; i < len; i++) d[i] = decay * 0.5 * (d[i - n] + d[i - n - 1]);
     cache.set(midi, b);
     return b;
   }
@@ -327,6 +331,7 @@
     const b = e.target.closest(".aa-chip");
     if (!b || b.dataset.id === cur.id) return;
     stopPractice();
+    audio();   // zvuk se musí odemknout přímo v kliknutí, brnknutí přijde až po animaci
     show(byId[b.dataset.id]);
     setTimeout(strumNow, 380);
   });
