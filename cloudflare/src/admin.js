@@ -1,5 +1,5 @@
 // /admin: správa dat webu (videa, písničky, kategorie, sekce, kanály, tipy). Texty webu zůstávají v kódu.
-import { adminUser } from "./access.js";
+import { isLoggedIn, loginConfigured, checkPassword, sessionCookie, logoutCookie } from "./session.js";
 import { esc, slugify, youtubeId } from "./util.js";
 
 const now = () => new Date().toISOString().slice(0, 19);
@@ -90,7 +90,7 @@ function html(body, status = 200) {
 
 const redirect = (url) => new Response(null, { status: 303, headers: { Location: url } });
 
-function shell(title, active, body, user) {
+function shell(title, active, body) {
   return html(`<!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -101,7 +101,7 @@ function shell(title, active, body, user) {
   <title>${esc(title)} · Správa Joy To Play</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css?v=26">
-  <link rel="stylesheet" href="/admin.css?v=1">
+  <link rel="stylesheet" href="/admin.css?v=2">
 </head>
 <body class="admin">
   <nav class="topnav" aria-label="Správa">
@@ -115,13 +115,13 @@ function shell(title, active, body, user) {
   </nav>
   <main class="wrap admin-main">
 ${body}
-    <footer>${esc(user)}</footer>
+    <footer><form method="post" action="/admin/logout"><button class="btn btn-quiet">Odhlásit</button></form></footer>
   </main>
 </body>
 </html>`);
 }
 
-async function overview(db, user) {
+async function overview(db) {
   const [counts, tips] = await db.batch([
     db.prepare(`SELECT (SELECT count(*) FROM videos WHERE status = 'published') AS videos, (SELECT count(*) FROM videos WHERE status = 'hidden') AS hidden,
                 (SELECT count(*) FROM songs) AS songs, (SELECT count(*) FROM tips WHERE status = 'new') AS tips`),
@@ -136,7 +136,7 @@ async function overview(db, user) {
       <a href="/admin/pisne"><b>${c.songs}</b><span>písniček ve zpěvníku</span></a>
     </div>
     <div class="admin-actions"><a class="btn btn-primary" href="/admin/videa/new">Přidat video</a><a class="btn btn-quiet" href="/admin/pisne/new">Přidat písničku</a></div>
-    ${tips.results.length ? `<h2>Nové tipy</h2>${tipList(tips.results)}` : ""}`, user);
+    ${tips.results.length ? `<h2>Nové tipy</h2>${tipList(tips.results)}` : ""}`);
 }
 
 function tipList(tips) {
@@ -152,11 +152,11 @@ function tipList(tips) {
       </li>`).join("")}</ul>`;
 }
 
-async function tipsPage(db, user) {
+async function tipsPage(db) {
   const { results } = await db.prepare("SELECT * FROM tips ORDER BY status = 'new' DESC, created DESC LIMIT 200").all();
   return shell("Tipy", "tipy", `
     <h1>Tipy od návštěvníků</h1>
-    ${results.length ? tipList(results) : `<p class="empty">Zatím žádné tipy.</p>`}`, user);
+    ${results.length ? tipList(results) : `<p class="empty">Zatím žádné tipy.</p>`}`);
 }
 
 async function tipAction(db, id, action) {
@@ -166,7 +166,7 @@ async function tipAction(db, id, action) {
   return redirect("/admin/tipy");
 }
 
-async function listPage(db, key, user, flash) {
+async function listPage(db, key, flash) {
   const e = ENTITIES[key];
   const { results } = await db.prepare(e.list).all();
   return shell(e.title, key, `
@@ -176,7 +176,7 @@ async function listPage(db, key, user, flash) {
     <ul class="admin-list">${results.map((r) => {
       const [main, sub, badge] = e.row(r);
       return `<li><a href="/admin/${key}/${r.id}"><b>${esc(main)}</b><span>${esc(sub)}</span></a>${badge ? `<em>${esc(badge)}</em>` : ""}</li>`;
-    }).join("")}</ul>`, user);
+    }).join("")}</ul>`);
 }
 
 async function field(f, value, db, extra) {
@@ -220,7 +220,7 @@ async function field(f, value, db, extra) {
   return `<div class="admin-field"><label for="${id}">${esc(f.label)}</label>${input}${hint}</div>`;
 }
 
-async function formPage(db, key, id, user, { values = null, error = "", tip = null } = {}) {
+async function formPage(db, key, id, { values = null, error = "", tip = null } = {}) {
   const e = ENTITIES[key];
   let row = values;
   if (!row && id) {
@@ -245,7 +245,7 @@ async function formPage(db, key, id, user, { values = null, error = "", tip = nu
         <a class="btn btn-quiet" href="/admin/${key}">Zpět</a>
         ${id ? `<button class="btn btn-quiet is-danger" name="action" value="delete" formnovalidate onclick="return confirm('Opravdu smazat? Nejde to vrátit.')">Smazat</button>` : ""}
       </div>
-    </form>`, user);
+    </form>`);
 }
 
 async function uniqueSlug(db, table, column, base, id) {
@@ -254,7 +254,7 @@ async function uniqueSlug(db, table, column, base, id) {
   return slug;
 }
 
-async function save(db, key, id, form, user) {
+async function save(db, key, id, form) {
   const e = ENTITIES[key];
   if (form.get("action") === "delete" && id) {
     await db.prepare(`DELETE FROM ${e.table} WHERE id = ?`).bind(id).run();
@@ -305,7 +305,7 @@ async function save(db, key, id, form, user) {
     const dup = await db.prepare("SELECT song FROM videos WHERE youtube_id = ? AND id != ?").bind(cols.youtube_id, id || 0).first();
     if (dup) error = `Tohle video už na webu je (${dup.song}).`;
   }
-  if (error) return formPage(db, key, id, user, { values, error, tip });
+  if (error) return formPage(db, key, id, { values, error, tip });
 
   const slugField = e.fields.find((f) => f.type === "slug");
   if (slugField) cols[slugField.name] = await uniqueSlug(db, e.table, slugField.name, cols[slugField.name], id);
@@ -330,34 +330,73 @@ async function save(db, key, id, form, user) {
   return redirect(`/admin/${key}?ok=${encodeURIComponent("Uloženo.")}`);
 }
 
+function loginPage(message = "", status = 200) {
+  return html(`<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex">
+  <title>Přihlášení · Správa Joy To Play</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css?v=26">
+  <link rel="stylesheet" href="/admin.css?v=2">
+</head>
+<body class="admin">
+  <main class="wrap admin-main admin-login">
+    <h1>Správa Joy To Play</h1>
+    ${message ? `<p class="alert">${esc(message)}</p>` : ""}
+    <form class="tile admin-form" method="post" action="/admin/login">
+      <div class="admin-field"><label for="f-password">Heslo</label>
+        <input id="f-password" name="password" type="password" autocomplete="current-password" required autofocus></div>
+      <div class="admin-actions"><button class="btn btn-primary">Přihlásit</button></div>
+    </form>
+  </main>
+</body>
+</html>`, status);
+}
+
 export async function handleAdmin(request, env, path) {
-  const user = await adminUser(request, env);
-  if (!user) {
-    return html(`<!DOCTYPE html><meta charset="utf-8"><title>Správa</title><p style="font:17px system-ui;padding:40px">Správa webu je přístupná jen po přihlášení přes Cloudflare Access.</p>`, 403);
-  }
   const url = new URL(request.url);
+  // Formuláře správy smí odeslat jen stránka správy (ochrana proti podvrženému odeslání z cizího webu).
+  if (request.method === "POST" && request.headers.get("Origin") !== url.origin) return html("Neplatný původ požadavku.", 403);
+
+  if (path === "/admin/login") {
+    if (!loginConfigured(env)) return loginPage("Správa ještě nemá nastavené heslo (tajný klíč ADMIN_PASSWORD).", 503);
+    if (request.method !== "POST") return loginPage();
+    const form = await request.formData();
+    const result = await checkPassword(String(form.get("password") || ""), request.headers.get("CF-Connecting-IP") || "?", env);
+    if (result === "ok") return new Response(null, { status: 303, headers: { Location: "/admin", "Set-Cookie": await sessionCookie(env) } });
+    if (result === "blocked") return loginPage("Moc špatných pokusů. Zkus to znovu za 15 minut.", 429);
+    return loginPage("Špatné heslo.", 401);
+  }
+  if (path === "/admin/logout" && request.method === "POST") {
+    return new Response(null, { status: 303, headers: { Location: "/admin/login", "Set-Cookie": logoutCookie() } });
+  }
+  if (!(await isLoggedIn(request, env))) {
+    return request.method === "GET" ? redirect("/admin/login") : html("Nejsi přihlášený.", 401);
+  }
   const db = env.DB;
   const [, , key = "", sub = ""] = path.split("/");
   const id = /^\d+$/.test(sub) ? Number(sub) : null;
 
   if (request.method === "POST") {
-    // Formuláře správy smí odeslat jen stránka správy (ochrana proti podvrženému odeslání z cizího webu).
-    if (request.headers.get("Origin") !== url.origin) return html("Neplatný původ požadavku.", 403);
     const form = await request.formData();
     if (key === "tipy" && id) return tipAction(db, id, form.get("action"));
-    if (ENTITIES[key] && (id || sub === "new")) return save(db, key, id, form, user);
+    if (ENTITIES[key] && (id || sub === "new")) return save(db, key, id, form);
     return html("Nenalezeno", 404);
   }
 
-  if (!key) return overview(db, user);
-  if (key === "tipy") return tipsPage(db, user);
+  if (!key) return overview(db);
+  if (key === "tipy") return tipsPage(db);
   if (!ENTITIES[key]) return html("Nenalezeno", 404);
-  if (!sub) return listPage(db, key, user, url.searchParams.get("ok"));
+  if (!sub) return listPage(db, key, url.searchParams.get("ok"));
   if (sub === "new") {
     const tipId = Number(url.searchParams.get("tip")) || null;
     const tip = key === "videa" && tipId ? await db.prepare("SELECT * FROM tips WHERE id = ?").bind(tipId).first() : null;
-    return formPage(db, key, null, user, { tip });
+    return formPage(db, key, null, { tip });
   }
-  if (id) return formPage(db, key, id, user);
+  if (id) return formPage(db, key, id);
   return html("Nenalezeno", 404);
 }

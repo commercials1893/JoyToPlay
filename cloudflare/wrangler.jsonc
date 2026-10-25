@@ -13,10 +13,7 @@
   "vars": {
     "SITE_URL": "https://kytara.tomasjindra.cz",
     // Turnstile: zatím testovací klíč Cloudflare (projde vždy). Ostrý klíč doplní Tomáš po založení widgetu.
-    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA",
-    // Cloudflare Access pro /admin: doplní se po nastavení Access (tým a AUD aplikace).
-    "ACCESS_TEAM": "",
-    "ACCESS_AUD": ""
+    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA"
   },
   "observability": { "enabled": true }
 }

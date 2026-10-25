@@ -38,3 +38,5 @@
 .admin-cats{display:flex;flex-wrap:wrap;gap:8px 18px}
 .admin-check{display:flex;align-items:center;gap:8px;font-size:16px}
 .admin-check input{width:18px;height:18px}
+.admin-login{max-width:420px;padding-top:15vh}
+.admin footer form{display:flex;justify-content:center}
