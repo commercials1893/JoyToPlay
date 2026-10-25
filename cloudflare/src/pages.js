@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "32";
+const ASSET_V = "33";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -15,7 +15,7 @@ const json = (data) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 function nav(home, path) {
   const links = [
-    [home ? "#videa" : "/#videa", "Videa"], ["/zpevnik", "Zpěvník"], ["/akordy", "Akordy"],
+    [home ? "#videa" : "/#videa", "Videa"], ["/zpevnik", "Zpěvník"], ["/akordy", "Akordy"], ["/ladicka", "Ladička"],
     [home ? "#sekce" : "/#sekce", "Sekce"], ["/kanaly", "Kanály"], ["/o-mne", "O mně"], ["/doporuc", "Doporuč"],
   ];
   return `
@@ -387,6 +387,66 @@ export function recommendPage(env) {
   });
 }
 
+// Budík ladičky: oblouk ±50 centů (±60°), čárky po 10 centech, zelený pruh ±5 centů.
+function gauge() {
+  const cx = 150, cy = 160, r = 130, pt = (deg, rr) => [cx + rr * Math.sin((deg * Math.PI) / 180), cy - rr * Math.cos((deg * Math.PI) / 180)].map((v) => v.toFixed(2));
+  const arc = (from, to, rr) => { const [x1, y1] = pt(from, rr), [x2, y2] = pt(to, rr); return `M${x1} ${y1} A${rr} ${rr} 0 0 1 ${x2} ${y2}`; };
+  const ticks = Array.from({ length: 11 }, (_, i) => {
+    const deg = (i - 5) * 12, [x1, y1] = pt(deg, r - (i % 5 ? 10 : 18)), [x2, y2] = pt(deg, r);
+    return `<line class="lt-tick" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+  }).join("");
+  return `<svg class="lt-gauge" viewBox="0 0 300 172" aria-hidden="true">
+          <path class="lt-arc" d="${arc(-60, 60, r)}"/>
+          <path class="lt-zone" d="${arc(-6, 6, r)}"/>
+          ${ticks}
+          <text class="lt-lbl" x="${pt(-60, r + 2)[0] - 6}" y="${+pt(-60, r)[1] + 22}">−50</text>
+          <text class="lt-lbl" x="${+pt(60, r + 2)[0] + 6}" y="${+pt(60, r)[1] + 22}">+50</text>
+          <g id="lt-needle" class="lt-needle"><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - r + 6}"/><circle cx="${cx}" cy="${cy}" r="7"/></g>
+        </svg>`;
+}
+
+export function tunerPage(env) {
+  return page(env, {
+    path: "/ladicka", title: "Ladička na kytaru",
+    description: "Online ladička na akustickou kytaru: povol mikrofon, brnkni a ručička ukáže, jestli přitáhnout, nebo povolit. Standardní ladění E A D G H e.",
+    body: `
+    <section id="ladicka" class="page">
+      <div class="sec-head">
+        <div class="eyebrow">Ladička</div>
+        <h1>Nalaď se. Pak hraj.</h1>
+        <p class="lead">Zapni ladičku, povol mikrofon a brnkni na strunu. Standardní ladění E A D G H e na akustiku.</p>
+      </div>
+      <div id="ladicka-app" class="lt">
+        <article class="tile lt-stage">
+          <div class="lt-read">
+            ${gauge()}
+            <div class="lt-big"><b id="lt-note">–</b><sub id="lt-oct"></sub></div>
+            <p class="lt-say" id="lt-say" aria-live="polite">Ladička čeká. Zapni ji a povol mikrofon.</p>
+            <p class="lt-hz"><span id="lt-cents"></span> <span id="lt-hz"></span></p>
+            <div class="lt-ctrl">
+              <button class="btn btn-primary" id="lt-mic" type="button">Zapnout ladičku</button>
+              <button class="aa-chip" id="lt-auto" type="button" aria-pressed="true">Automaticky</button>
+            </div>
+          </div>
+          <div class="lt-photo">
+            <div class="lt-head">
+              <img src="/assets/ll16-hlava.jpg?v=${ASSET_V}" alt="Hlava mojí kytary Yamaha LL16" width="562" height="1000">
+              <div id="lt-pegs"></div>
+            </div>
+            <p class="lt-cap">Moje Yamaha LL16</p>
+          </div>
+        </article>
+        <div class="lt-foot">
+          <div class="lt-a4"><span>Ladicí A</span><button id="lt-down" type="button" aria-label="Snížit o 1 Hz">−</button><b id="lt-a4" class="num">440 Hz</b><button id="lt-up" type="button" aria-label="Zvýšit o 1 Hz">+</button></div>
+          <p>Klik na kolíček zahraje tón struny. Se zapnutou ladičkou ji tím zamkneš na jednu strunu, „Automaticky“ to vrátí. Zvuk z mikrofonu zůstává v tvém prohlížeči a nikam se neposílá.</p>
+        </div>
+      </div>
+      <noscript><p class="lead" style="margin-inline:auto;text-align:center">Ladička potřebuje zapnutý JavaScript.</p></noscript>
+      <script src="/ladicka.js?v=${ASSET_V}" defer></script>
+    </section>`,
+  });
+}
+
 export function videoPage({ video: v, categories, songs, related }, env) {
   const site = env.SITE_URL;
   const body = `
@@ -473,7 +533,7 @@ export function sitemap({ videos, songs }, env) {
   const url = (path, lastmod) => `  <url>\n    <loc>${site}${path}</loc>${lastmod ? `\n    <lastmod>${lastmod.slice(0, 10)}</lastmod>` : ""}\n  </url>`;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${[url("/"), ...["/zpevnik", "/akordy", "/kanaly", "/o-mne", "/doporuc"].map((p) => url(p)), ...videos.map((v) => url(`/video/${v.slug}`, v.added)), ...songs.map((s) => url(`/pisen/${s.slug}`))].join("\n")}
+${[url("/"), ...["/zpevnik", "/akordy", "/ladicka", "/kanaly", "/o-mne", "/doporuc"].map((p) => url(p)), ...videos.map((v) => url(`/video/${v.slug}`, v.added)), ...songs.map((s) => url(`/pisen/${s.slug}`))].join("\n")}
 </urlset>
 `;
 }

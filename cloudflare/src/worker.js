@@ -1,6 +1,6 @@
 // Joy To Play: veřejný web, formulář tipů a /admin. Statické soubory (CSS, JS, obrázky) jdou z public/ přes ASSETS.
 import { loadSite, loadVideo, loadSong, loadSitemap } from "./data.js";
-import { homePage, songbookPage, chordsPage, channelsPage, aboutPage, recommendPage, videoPage, songPage, notFoundPage, sitemap } from "./pages.js";
+import { homePage, songbookPage, chordsPage, tunerPage, channelsPage, aboutPage, recommendPage, videoPage, songPage, notFoundPage, sitemap } from "./pages.js";
 import { handleAdmin } from "./admin.js";
 
 // Testovací tajný klíč Cloudflare k testovacímu site key 1x000…AA (projde vždy).
@@ -51,6 +51,7 @@ async function route(request, env) {
   if (path === "/") return respond(homePage(await loadSite(env.DB), env));
   if (path === "/zpevnik") return respond(songbookPage(await loadSite(env.DB), env));
   if (path === "/akordy") return respond(chordsPage(env));
+  if (path === "/ladicka") return respond(tunerPage(env));
   if (path === "/kanaly") return respond(channelsPage(await loadSite(env.DB), env));
   if (path === "/o-mne") return respond(aboutPage(env));
   if (path === "/doporuc") return respond(recommendPage(env));
