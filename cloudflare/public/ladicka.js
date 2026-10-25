@@ -33,7 +33,8 @@
     if (!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
     }
-    if (ctx.state === "suspended") ctx.resume();
+    // Safari po mikrofonu nechá zvuk ve stavu „interrupted“; obnovit je potřeba z každého stavu kromě „running“.
+    if (ctx.state !== "running") ctx.resume().catch(() => {});
     return ctx;
   }
   // Referenční tón: drnknutá struna (Karplus-Strong) přesně na cílové frekvenci.
@@ -179,6 +180,8 @@
     clearInterval(timer);
     if (stream) stream.getTracks().forEach((t) => t.stop());
     stream = null; listening = false;
+    // Zvuk po mikrofonu zavřít a příště založit nový: Safari jinak může nechat přehrávání potichu.
+    if (ctx) { ctx.close().catch(() => {}); ctx = null; analyser = null; }
     session("playback");
     root.classList.remove("is-on", "is-quiet");
     $("lt-mic").textContent = "Zapnout ladičku";
@@ -201,6 +204,8 @@
   $("lt-down").onclick = () => setA4(a4 - 1);
   $("lt-up").onclick = () => setA4(a4 + 1);
   document.addEventListener("visibilitychange", () => { if (document.hidden && listening) stop(); });
+  // Odchod ze stránky s puštěným mikrofonem: uvolnit mikrofon i zvuk, ať další stránka v kartě hraje.
+  window.addEventListener("pagehide", () => { if (listening) stop(); });
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     $("lt-mic").disabled = true;

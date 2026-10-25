@@ -44,7 +44,9 @@
       top.type = "lowpass"; top.frequency.value = 5200;
       master.connect(body).connect(top).connect(ctx.destination);
     }
-    if (ctx.state === "suspended") ctx.resume();
+    // Safari po mikrofonu (Ladička) nechá zvuk ve stavu „interrupted“; obnovit je potřeba z každého stavu kromě „running“.
+    if (ctx.state === "closed") { ctx = null; cache.clear(); return audio(); }
+    if (ctx.state !== "running") ctx.resume().catch(() => {});
     return ctx;
   }
   function buffer(midi) {
