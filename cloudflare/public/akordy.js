@@ -29,12 +29,15 @@
 
   // ----- zvuk: Karplus-Strong (drnknutá struna), každá výška tónu se vygeneruje jednou -----
   const OPEN_MIDI = [40, 45, 50, 55, 59, 64];
+  // Režim zvuku (navigator.audioSession) jen na iPhonu a iPadu, kvůli tichému režimu. Na Macu ho Safari
+  // po použití mikrofonu (Ladička) nechá v rozbitém stavu a pak nehraje vůbec nic (2026-10-25).
+  const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   let ctx = null, master = null;
   const cache = new Map();
   function audio() {
     if (!ctx) {
       // iPhone: bez tohohle Web Audio mlčí, když je zapnutý tichý režim
-      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
+      try { if (IOS && navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
       ctx = new (window.AudioContext || window.webkitAudioContext)();
       master = ctx.createGain();
       master.gain.value = 0.55;
@@ -433,6 +436,10 @@
     restart();
   });
   ccDraw();
+
+  // Diagnostika zvuku pro ladění v Safari: /akordy?zvuk=diag
+  window.jtpAudio = () => ctx;
+  if (/[?&]zvuk=diag/.test(location.search)) document.head.append(Object.assign(document.createElement("script"), { src: "/zvuk-diag.js" }));
 
   build();
   // Odkaz z karty videa: /akordy?akord=Em otevře rovnou ten akord.

@@ -25,8 +25,11 @@
   let ctx = null;
   // Režim zvuku Safari: bez mikrofonu „playback“ (hraje i v tichém režimu iPhonu), s mikrofonem si ho Safari zvolí samo.
   // „play-and-record“ natvrdo nastavovat nejde: Safari pak referenční tóny nepřehrál.
+  // Režim zvuku (navigator.audioSession) jen na iPhonu a iPadu, kvůli tichému režimu. Na Macu ho Safari
+  // po použití mikrofonu (Ladička) nechá v rozbitém stavu a pak nehraje vůbec nic (2026-10-25).
+  const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   function session(type) {
-    try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (_) {}
+    try { if (IOS && navigator.audioSession) navigator.audioSession.type = type; } catch (_) {}
   }
   function audio() {
     if (!listening) session("playback");
@@ -211,5 +214,8 @@
     $("lt-mic").disabled = true;
     idle("Tenhle prohlížeč nepustí stránku k mikrofonu. Zkus Safari nebo Chrome.");
   }
+  // Diagnostika zvuku pro ladění v Safari: /ladicka?zvuk=diag
+  window.jtpAudio = () => ctx;
+  if (/[?&]zvuk=diag/.test(location.search)) document.head.append(Object.assign(document.createElement("script"), { src: "/zvuk-diag.js" }));
   setA4(a4);
 })();
