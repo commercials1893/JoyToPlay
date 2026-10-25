@@ -146,6 +146,7 @@ function bindPlayer() {
 }
 
 // Turnstile se načte, až když je formulář blízko obrazovky, ať úvod zbytečně nezdržuje.
+// Sleduje se celý formulář: prázdný box widgetu je skrytý a sám by se na obrazovce nikdy „neobjevil“.
 function loadTurnstile(box, sitekey) {
   let widget = null;
   const ready = new Promise((resolve) => {
@@ -167,7 +168,7 @@ function loadTurnstile(box, sitekey) {
       inject();
       observer.disconnect();
     }
-  }, { rootMargin: "600px" }).observe(box);
+  }, { rootMargin: "600px" }).observe(box.closest("form"));
   return {
     // Ověření běží na pozadí; na token počkáme nejvýš 15 sekund.
     token: async () => {
@@ -187,7 +188,7 @@ function loadTurnstile(box, sitekey) {
 function bindForm() {
   const form = document.getElementById("recommend-form");
   const note = document.getElementById("recommend-note");
-  const captcha = loadTurnstile(document.getElementById("turnstile"), SITE.turnstile);
+  const captcha = loadTurnstile(document.getElementById("turnstile-box"), SITE.turnstile);
   const say = (text, ok) => {
     note.textContent = text;
     note.style.color = ok ? "var(--ok)" : "var(--risk)";

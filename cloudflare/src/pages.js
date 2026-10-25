@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "27";
+const ASSET_V = "28";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -263,7 +263,7 @@ export function homePage(data, env) {
           <input name="url" type="url" required maxlength="500" placeholder="Odkaz na video na YouTube" aria-label="Odkaz na video">
           <input name="why" type="text" required maxlength="1000" placeholder="Proč to stojí za čas?">
           <input name="_gotcha" type="text" tabindex="-1" autocomplete="off" hidden>
-          <div class="turnstile" id="turnstile"></div>
+          <div class="turnstile" id="turnstile-box"></div>
           <button class="btn btn-primary" type="submit">Poslat TJ</button>
         </form>
         <p id="recommend-note" hidden></p>
