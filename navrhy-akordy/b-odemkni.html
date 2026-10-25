@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Akordy · návrh B · Odemkni písničky</title>
+  <link rel="icon" href="../cloudflare/public/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../cloudflare/public/styles.css">
+  <link rel="stylesheet" href="navrhy.css">
+  <script src="akordy.js"></script>
+  <style>
+    .bb-score{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,44px);align-items:center;padding:clamp(22px,4vw,40px)}
+    .bb-ring{position:relative;width:clamp(120px,22vw,176px);aspect-ratio:1}
+    .bb-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+    .bb-ring .bg{stroke:var(--sunk)}
+    .bb-ring .fg{stroke:url(#bb-grad);stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.3,1.2,.5,1)}
+    .bb-ring div{position:absolute;inset:0;display:grid;place-items:center;align-content:center;text-align:center}
+    .bb-ring b{font-family:var(--f-display);font-size:clamp(40px,7vw,60px);line-height:1;letter-spacing:-.04em}
+    .bb-ring small{font-size:12px;color:var(--muted)}
+    .bb-say h3{font-size:clamp(24px,3.4vw,34px);letter-spacing:-.03em;line-height:1.12}
+    .bb-say p{color:var(--muted);margin-top:8px;font-size:16px}
+    .bb-next{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--accent-soft);border-radius:var(--r);padding:14px 16px}
+    .bb-next .big{font-family:var(--f-display);font-size:34px;font-weight:700;color:var(--accent);letter-spacing:-.03em;min-width:1.4em;text-align:center}
+    .bb-next p{margin:0;color:var(--ink);font-size:15px;flex:1 1 220px}
+    .bb-next .btn{font-size:15px;padding:9px 18px}
+    .bb-chords{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
+    .bb-ch{position:relative;font:inherit;background:var(--surface);border:2px solid transparent;border-radius:var(--r);box-shadow:var(--shadow);padding:12px 10px 8px;cursor:pointer;color:var(--ink);display:grid;justify-items:center;gap:2px;transition:transform .15s ease,border-color .2s ease,background .2s ease}
+    :root[data-theme="dark"] .bb-ch{background:var(--surface);border-color:var(--line)}
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bb-ch{border-color:var(--line)}}
+    .bb-ch:hover{transform:translateY(-2px)}
+    .bb-ch b{font-family:var(--f-display);font-size:22px;letter-spacing:-.02em}
+    .bb-ch .chordbox{width:78px;opacity:.55;transition:opacity .2s}
+    .bb-ch[aria-pressed="true"]{border-color:var(--accent)!important;background:var(--accent-soft)}
+    .bb-ch[aria-pressed="true"] .chordbox{opacity:1}
+    .bb-ch .ok{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+    .bb-ch[aria-pressed="true"] .ok{transform:scale(1)}
+    .bb-ch.hint{animation:hint 1.6s ease-in-out infinite}
+    @keyframes hint{0%,100%{box-shadow:0 0 0 0 rgba(0,113,227,0)}50%{box-shadow:0 0 0 6px rgba(0,113,227,.25)}}
+    .bb-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+    .bb-col{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:22px;display:grid;gap:4px}
+    .bb-col h3{font-size:18px;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+    .bb-col h3 span{font-size:14px;color:var(--muted);font-weight:500}
+    .bb-song{display:grid;gap:5px;padding:10px 0;border-top:1px solid var(--line);text-decoration:none;color:inherit}
+    .bb-song:first-of-type{border-top:0}
+    .bb-song b{font-weight:600;font-size:15.5px;letter-spacing:-.01em}
+    .bb-song small{color:var(--muted);font-size:13px}
+    .bb-pills{display:flex;flex-wrap:wrap;gap:4px}
+    .bb-pills i{font-style:normal;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--ok-soft);color:var(--ok)}
+    .bb-pills i.miss{background:var(--warn-soft);color:var(--warn)}
+    .bb-song.fresh{animation:fresh 1.4s ease-out}
+    @keyframes fresh{0%{background:var(--ok-soft);transform:scale(1.03)}100%{background:transparent;transform:none}}
+    .bb-empty{color:var(--muted);font-size:14px;padding:6px 0}
+    .bb-note{text-align:center;font-size:13px;color:var(--muted)}
+    .bb-toast{position:fixed;left:50%;top:70px;transform:translate(-50%,-20px);opacity:0;z-index:40;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:15px;font-weight:600;transition:all .35s cubic-bezier(.3,1.4,.5,1);pointer-events:none;white-space:nowrap}
+    .bb-toast.on{opacity:1;transform:translate(-50%,0)}
+    @media (max-width:860px){.bb-cols{grid-template-columns:1fr}}
+    @media (max-width:600px){
+      .bb-score{grid-template-columns:1fr;justify-items:center;text-align:center}
+      .bb-next{text-align:left}
+      .bb-chords{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+      .bb-ch .chordbox{width:64px}
+    }
+  </style>
+</head>
+<body>
+  <nav class="topnav" aria-label="Navigace">
+    <div class="in">
+      <b><a class="logo" href="#"><span>Joy To Play</span></a></b>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16"/><path d="M4 16h16"/></svg></button>
+      <div class="nav-links" id="nav-links">
+        <a href="#">Videa</a><a href="#">Zpěvník</a><a href="#akordy" aria-current="page">Akordy<span class="new-badge">Nové</span></a><a href="#">Sekce</a><a href="#">Kanály</a><a href="#">O mně</a><a href="#">Doporuč</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <section id="akordy">
+      <div class="sec-head">
+        <div class="eyebrow">Akordy</div>
+        <h2>Co už umíš zahrát?</h2>
+        <p class="lead">Klikni na akordy, které znáš. Hned uvidíš, které písničky ze zpěvníku zvládneš a který akord se vyplatí naučit jako další.</p>
+      </div>
+
+      <article class="tile bb-score">
+        <div class="bb-ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <defs><linearGradient id="bb-grad" x1="1" x2="0"><stop offset="0" stop-color="#0071E3"/><stop offset=".6" stop-color="#8944AB"/><stop offset="1" stop-color="#D70015"/></linearGradient></defs>
+            <circle class="bg" cx="60" cy="60" r="52" fill="none" stroke-width="12"/>
+            <circle class="fg" id="bb-arc" cx="60" cy="60" r="52" fill="none" stroke-width="12" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div><b class="num" id="bb-n">0</b><small id="bb-of">z 0 písniček</small></div>
+        </div>
+        <div class="bb-say">
+          <h3 id="bb-head">Začni tím, co už znáš.</h3>
+          <p id="bb-sub">Žádný akord? Nevadí, poradím ti, čím začít.</p>
+          <div class="bb-next" id="bb-next"></div>
+        </div>
+      </article>
+
+      <div class="bb-chords" id="bb-chords"></div>
+
+      <div class="bb-cols">
+        <div class="bb-col"><h3>Zahraješ hned <span id="c-now">0</span></h3><div id="l-now"></div></div>
+        <div class="bb-col"><h3>Chybí jeden akord <span id="c-one">0</span></h3><div id="l-one"></div></div>
+        <div class="bb-col"><h3>Na později <span id="c-later">0</span></h3><div id="l-later"></div></div>
+      </div>
+      <p class="bb-note">Ukázka na 20 písničkách. Akordy u písniček jsou v návrhu orientační, na webu by je bylo potřeba doplnit a ověřit u všech 97.<br>Vybrané akordy si prohlížeč pamatuje.</p>
+    </section>
+
+    <footer>Joy To Play · Nauč se málo. Zahraj hodně.</footer>
+
+    <div class="proto">
+      <a href="index.html">Přehled</a>
+      <a href="a-hmatnik.html">A · Hmatník</a>
+      <a href="b-odemkni.html" aria-current="page">B · Odemkni písničky</a>
+      <a href="c-doprovod.html">C · Hraj s doprovodem</a>
+      <button type="button" data-theme-toggle></button>
+    </div>
+  </div>
+  <div class="bb-toast" id="bb-toast"></div>
+
+<script>
+(() => {
+  const A = window.Akordy;
+  // UKÁZKOVÁ DATA: akordy u písniček jsou orientační (běžné verze), na webu je potřeba je ověřit a doplnit u všech písniček.
+  const SONGS = [
+    ["John Denver", "Take Me Home, Country Roads", "G Em D C"],
+    ["Ben E. King", "Stand by Me", "G Em C D"],
+    ["Johnny Cash", "Ring of Fire", "G C D"],
+    ["Bob Dylan", "Blowin' in the Wind", "G C D"],
+    ["Tlustá Berta", "Bláznivá Zuzana", "G C D"],
+    ["The Pogues", "Dirty Old Town", "G C D Em"],
+    ["Coldplay", "Viva la Vida", "C D G Em"],
+    ["Bob Dylan", "It Ain't Me Babe", "G Am C D"],
+    ["Dolly Parton", "Jolene", "Am C G Em"],
+    ["Deep Blue Something", "Breakfast at Tiffany's", "D G A Em"],
+    ["Guns N' Roses", "Sweet Child O' Mine", "D C G A"],
+    ["Johnny Cash", "A Boy Named Sue", "A D E7"],
+    ["Johnny Cash", "Folsom Prison Blues", "E A H7"],
+    ["Ivan Mládek", "Jožin z bažin", "Am Dm E"],
+    ["Různé", "Blue Moon", "C Am Dm G7"],
+    ["U2", "With or Without You", "D A Hm G"],
+    ["Johnny Cash", "Hurt", "Am C D G F"],
+    ["Jeff Buckley", "Hallelujah", "C Am F G E7"],
+    ["Karel Kryl", "Anděl", "Am Dm E C G"],
+    ["The Beatles", "Hey Jude", "F C C7 B"],
+  ].map(([artist, song, ch]) => ({ artist, song, chords: ch.split(" ") }));
+
+  const $ = (id) => document.getElementById(id);
+  const pl = (n, one, few, many) => (n === 1 ? one : n > 1 && n < 5 ? few : many);
+  let known = new Set();
+  try { known = new Set(JSON.parse(localStorage.getItem("jtp-akordy") || "[]")); } catch (e) {}
+  const save = () => { try { localStorage.setItem("jtp-akordy", JSON.stringify([...known])); } catch (e) {} };
+  const missing = (s, k = known) => s.chords.filter((c) => !k.has(c));
+  const playable = (k = known) => SONGS.filter((s) => missing(s, k).length === 0);
+
+  $("bb-chords").innerHTML = A.CHORDS.map((c) => `<button class="bb-ch" type="button" data-id="${c.id}" aria-pressed="false" aria-label="${c.full}"><span class="ok">✓</span><b>${c.name}</b>${A.box(c, { fingers: false })}</button>`).join("");
+
+  // který akord se vyplatí nejvíc: kolik písniček odemkne; když žádnou, tak ve kolika chybějících písničkách je
+  function bestNext() {
+    const now = playable().length;
+    let best = null;
+    for (const c of A.CHORDS) {
+      if (known.has(c.id)) continue;
+      const k = new Set(known); k.add(c.id);
+      const gain = playable(k).length - now;
+      const freq = SONGS.filter((s) => missing(s).includes(c.id)).reduce((a, s) => a + 1 / missing(s).length, 0);
+      const score = gain * 100 + freq;
+      if (!best || score > best.score) best = { c, gain, score, songs: playable(k).filter((s) => missing(s).length) };
+    }
+    return best;
+  }
+
+  let shown = 0, prevPlayable = new Set();
+  function animateNumber(to) {
+    const from = shown, t0 = performance.now();
+    const step = (t) => {
+      const p = Math.min(1, (t - t0) / 600), v = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3)));
+      $("bb-n").textContent = v;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+    shown = to;
+  }
+  const songRow = (s, fresh) => `<a class="bb-song${fresh ? " fresh" : ""}" href="#" onclick="return false"><b>${s.song}</b><small>${s.artist}</small><span class="bb-pills">${s.chords.map((c) => `<i class="${known.has(c) ? "" : "miss"}">${c}</i>`).join("")}</span></a>`;
+
+  function render() {
+    document.querySelectorAll(".bb-ch").forEach((b) => b.setAttribute("aria-pressed", known.has(b.dataset.id)));
+    const now = playable(), nowSet = new Set(now.map((s) => s.song));
+    const one = SONGS.filter((s) => missing(s).length === 1), later = SONGS.filter((s) => missing(s).length > 1);
+    animateNumber(now.length);
+    $("bb-of").textContent = `z ${SONGS.length} písniček`;
+    $("bb-arc").style.strokeDashoffset = 326.7 * (1 - now.length / SONGS.length);
+    $("c-now").textContent = now.length; $("c-one").textContent = one.length; $("c-later").textContent = later.length;
+    $("l-now").innerHTML = now.map((s) => songRow(s, !prevPlayable.has(s.song))).join("") || `<p class="bb-empty">Zatím nic. Vyber pár akordů nahoře.</p>`;
+    $("l-one").innerHTML = one.map((s) => songRow(s)).join("") || `<p class="bb-empty">Tady nic nečeká.</p>`;
+    $("l-later").innerHTML = later.map((s) => songRow(s)).join("") || `<p class="bb-empty">Všechno ostatní už máš.</p>`;
+    const fresh = [...nowSet].filter((x) => !prevPlayable.has(x)).length;
+    if (prevPlayable.size || known.size) if (fresh) toast(`Odemčeno: +${fresh} ${pl(fresh, "písnička", "písničky", "písniček")}`);
+    prevPlayable = nowSet;
+
+    const pct = Math.round((now.length / SONGS.length) * 100);
+    $("bb-head").textContent = known.size === 0 ? "Začni tím, co už znáš." : now.length === 0 ? "Ještě kousek a první písnička je tvoje." : now.length === SONGS.length ? "Celý zpěvník je tvůj." : `Zahraješ ${pct} % zpěvníku.`;
+    $("bb-sub").textContent = known.size === 0 ? "Žádný akord? Nevadí, poradím ti, čím začít." : `Umíš ${known.size} ${known.size === 1 ? "akord" : known.size < 5 ? "akordy" : "akordů"}.`;
+    document.querySelectorAll(".bb-ch.hint").forEach((b) => b.classList.remove("hint"));
+    const n = bestNext();
+    if (!n) { $("bb-next").hidden = true; return; }
+    $("bb-next").hidden = false;
+    document.querySelector(`.bb-ch[data-id="${n.c.id}"]`).classList.add("hint");
+    const list = n.songs.slice(0, 3).map((s) => s.song).join(", ");
+    $("bb-next").innerHTML = `<span class="big">${n.c.name}</span><p>${n.gain > 0
+      ? `Nauč se <b>${n.c.name}</b> a odemkneš ${n.gain === 1 ? "další písničku" : n.gain < 5 ? `další ${n.gain} písničky` : `dalších ${n.gain} písniček`}: ${list}${n.songs.length > 3 ? " a další" : ""}.`
+      : `<b>${n.c.name}</b> je v nejvíc písničkách, které ti chybí. Dobrý další krok.`}</p><button class="btn btn-primary" type="button" id="bb-add">Umím ${n.c.name}</button>`;
+    $("bb-add").onclick = () => toggle(n.c.id);
+  }
+  let tt;
+  function toast(t) { const el = $("bb-toast"); el.textContent = t; el.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => el.classList.remove("on"), 1800); }
+  function toggle(id) {
+    if (known.has(id)) known.delete(id); else { known.add(id); A.strum(A.byId[id]); }
+    save(); render();
+  }
+  $("bb-chords").addEventListener("click", (e) => { const b = e.target.closest(".bb-ch"); if (b) toggle(b.dataset.id); });
+  prevPlayable = new Set(playable().map((s) => s.song));
+  render();
+
+  const nav = document.querySelector(".topnav");
+  $("nav-toggle").onclick = () => nav.classList.toggle("is-open");
+})();
+</script>
+</body>
+</html>

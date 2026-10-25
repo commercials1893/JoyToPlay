@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Akordy · návrh C · Hraj s doprovodem</title>
+  <link rel="icon" href="../cloudflare/public/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../cloudflare/public/styles.css">
+  <link rel="stylesheet" href="navrhy.css">
+  <script src="akordy.js"></script>
+  <style>
+    .cc-progs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+    .cc-prog{font:inherit;text-align:left;background:var(--surface);border:2px solid transparent;border-radius:var(--r);box-shadow:var(--shadow);padding:16px;cursor:pointer;color:var(--ink);display:grid;gap:6px;transition:transform .15s,border-color .2s}
+    :root[data-theme="dark"] .cc-prog{border-color:var(--line)}
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cc-prog{border-color:var(--line)}}
+    .cc-prog:hover{transform:translateY(-2px)}
+    .cc-prog[aria-pressed="true"]{border-color:var(--accent)!important}
+    .cc-prog b{font-family:var(--f-display);font-size:19px;letter-spacing:-.02em;white-space:nowrap}
+    .cc-prog span{font-size:13px;color:var(--muted);line-height:1.35}
+    .cc-player{position:relative;padding:clamp(20px,4vw,40px);gap:26px}
+    .cc-now{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px}
+    .cc-cur{display:grid;justify-items:center;gap:6px;grid-column:2}
+    .cc-cur .name{font-family:var(--f-display);font-size:clamp(56px,9vw,88px);font-weight:700;line-height:.9;letter-spacing:-.05em}
+    .cc-cur .chordbox{width:clamp(170px,26vw,230px);transition:transform .25s cubic-bezier(.3,1.5,.5,1)}
+    .cc-cur.pop .chordbox,.cc-cur.pop .name{animation:pop .35s cubic-bezier(.3,1.5,.5,1)}
+    @keyframes pop{0%{transform:scale(.88);opacity:.4}100%{transform:none;opacity:1}}
+    .cc-next{justify-self:start;display:grid;justify-items:center;gap:4px;opacity:.6}
+    .cc-next small{font-size:12px;color:var(--muted);font-weight:600}
+    .cc-next .name{font-family:var(--f-display);font-size:30px;font-weight:700;letter-spacing:-.03em}
+    .cc-next .chordbox{width:84px}
+    .cc-next.soon{opacity:1}
+    .cc-next.soon .name{color:var(--accent)}
+    .cc-beats{justify-self:end;display:flex;gap:8px}
+    .cc-beats i{width:14px;height:14px;border-radius:50%;background:var(--line);transition:transform .08s,background .08s}
+    .cc-beats i.on{background:var(--accent);transform:scale(1.3)}
+    .cc-count{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-size:120px;font-weight:800;color:var(--accent);pointer-events:none;opacity:0}
+    .cc-count.on{animation:cnt .5s ease-out}
+    @keyframes cnt{0%{opacity:.9;transform:scale(.7)}100%{opacity:0;transform:scale(1.3)}}
+    .cc-time{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .cc-bar{background:var(--sunk);border-radius:12px;padding:10px 12px;font-family:var(--f-display);font-weight:700;font-size:18px;letter-spacing:-.02em;transition:background .2s,color .2s}
+    .cc-bar.on{background:var(--accent);color:#fff}
+    .cc-head{position:absolute;top:-6px;bottom:-6px;width:3px;border-radius:2px;background:var(--risk);left:0;transition:left linear}
+    .cc-strokes{display:flex;justify-content:center;gap:clamp(6px,2vw,14px);font-size:26px;font-weight:700;color:var(--muted);min-height:36px}
+    .cc-strokes i{font-style:normal;width:28px;text-align:center;opacity:.35;transition:opacity .06s,color .06s,transform .06s}
+    .cc-strokes i.rest{opacity:.12}
+    .cc-strokes i.on{opacity:1;color:var(--accent);transform:scale(1.25)}
+    .cc-ctrl{display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,28px);flex-wrap:wrap}
+    .cc-play{width:72px;height:72px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:26px;cursor:pointer;box-shadow:0 8px 24px rgba(0,113,227,.35);transition:transform .15s}
+    .cc-play:hover{transform:scale(1.06)}
+    .cc-tempo{display:grid;gap:4px;min-width:200px}
+    .cc-tempo label{font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+    .cc-tempo label b{color:var(--ink);font-variant-numeric:tabular-nums}
+    .cc-tempo input{width:100%;accent-color:var(--accent)}
+    .cc-opt{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer}
+    .cc-opt input{accent-color:var(--accent);width:18px;height:18px}
+    .cc-stat{text-align:center;font-size:14px;color:var(--muted);min-height:20px}
+    .cc-stat b{color:var(--ink)}
+    @media (max-width:980px){.cc-progs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:600px){
+      .cc-progs{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-20px;padding:4px 20px 14px;scrollbar-width:none}
+      .cc-prog{flex:0 0 58%;padding:12px;scroll-snap-align:start}
+      .cc-prog b{font-size:16px}
+      .cc-now{grid-template-columns:1fr 1fr;gap:10px}
+      .cc-cur{grid-column:1/-1}
+      .cc-beats{grid-row:2;grid-column:1;justify-self:start;align-self:center}
+      .cc-next{grid-row:2;grid-column:2;justify-self:end;grid-template-columns:auto auto;align-items:center;column-gap:10px}
+      .cc-next small{grid-column:1/-1}
+      .cc-next .chordbox{width:60px}
+      .cc-bar{font-size:15px;padding:8px}
+      .cc-strokes{font-size:20px;gap:2px}
+      .cc-strokes i{width:22px}
+    }
+  </style>
+</head>
+<body>
+  <nav class="topnav" aria-label="Navigace">
+    <div class="in">
+      <b><a class="logo" href="#"><span>Joy To Play</span></a></b>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16"/><path d="M4 16h16"/></svg></button>
+      <div class="nav-links" id="nav-links">
+        <a href="#">Videa</a><a href="#">Zpěvník</a><a href="#akordy" aria-current="page">Akordy<span class="new-badge">Nové</span></a><a href="#">Sekce</a><a href="#">Kanály</a><a href="#">O mně</a><a href="#">Doporuč</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <section id="akordy">
+      <div class="sec-head">
+        <div class="eyebrow">Akordy</div>
+        <h2>Čtyři akordy. Spousta písniček.</h2>
+        <p class="lead">Vyber si postup, pusť doprovod a hraj s ním. Ukáže ti, co přijde, ještě než to přijde.</p>
+      </div>
+
+      <div class="cc-progs" id="cc-progs"></div>
+
+      <article class="tile cc-player">
+        <div class="cc-now">
+          <div class="cc-beats" id="cc-beats"></div>
+          <div class="cc-cur" id="cc-cur"><div class="name" id="cc-name"></div><div id="cc-box"></div></div>
+          <div class="cc-next" id="cc-next"><small>Další</small><div class="name" id="cc-nname"></div><div id="cc-nbox"></div></div>
+        </div>
+        <div class="cc-time" id="cc-time"><div class="cc-head" id="cc-head"></div></div>
+        <div class="cc-strokes" id="cc-strokes" aria-label="Rytmus"></div>
+        <div class="cc-ctrl">
+          <button class="cc-play" id="cc-play" type="button" aria-label="Hrát">▶︎</button>
+          <div class="cc-tempo"><label for="cc-bpm">Tempo <b id="cc-bpmv">72 BPM</b></label><input id="cc-bpm" type="range" min="50" max="140" step="2" value="72"></div>
+          <div class="tabs" role="tablist" id="cc-rh"></div>
+          <label class="cc-opt"><input type="checkbox" id="cc-up"> Každé kolo o kousek rychleji</label>
+        </div>
+        <p class="cc-stat" id="cc-stat">Zmáčkni ▶︎. Nejdřív odpočítám čtyři doby.</p>
+        <div class="cc-count" id="cc-count"></div>
+      </article>
+    </section>
+
+    <footer>Joy To Play · Nauč se málo. Zahraj hodně.</footer>
+
+    <div class="proto">
+      <a href="index.html">Přehled</a>
+      <a href="a-hmatnik.html">A · Hmatník</a>
+      <a href="b-odemkni.html">B · Odemkni písničky</a>
+      <a href="c-doprovod.html" aria-current="page">C · Hraj s doprovodem</a>
+      <button type="button" data-theme-toggle></button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const A = window.Akordy, $ = (id) => document.getElementById(id);
+  // Postupy jsou obecné. Písničky u nich jsou jen orientační příklad, na webu by se braly z dat zpěvníku.
+  const PROGS = [
+    { chords: ["G", "D", "Em", "C"], hint: "Táborák i rádio. Třeba Country Roads." },
+    { chords: ["C", "Am", "Dm", "G7"], hint: "Padesátky. Blue Moon a spol." },
+    { chords: ["Am", "Fmaj7", "C", "G"], hint: "Smutnější a s lehkým F." },
+    { chords: ["E", "A", "H7", "A"], hint: "Country a Johnny Cash." },
+    { chords: ["D", "A", "Hm", "G"], hint: "Až zvládneš barré. U2." },
+  ];
+  // osminy v taktu: D dolů, U nahoru, d lehce dolů, . pauza
+  const RH = [
+    { id: "down", label: "Dolů", p: "D.D.D.D." },
+    { id: "camp", label: "Táborák", p: "D.DU.UDU" },
+    { id: "waltz", label: "Valčík", p: "D.d.d." },
+  ];
+  let prog = PROGS[0], rh = RH[1], bpm = 72, player = null, round = 0;
+
+  $("cc-progs").innerHTML = PROGS.map((p, i) => `<button class="cc-prog" type="button" data-i="${i}" aria-pressed="${i === 0}"><b>${p.chords.join(" · ")}</b><span>${p.hint}</span></button>`).join("");
+  $("cc-rh").innerHTML = RH.map((r) => `<button class="tab" type="button" role="tab" data-id="${r.id}" aria-selected="${r === rh}">${r.label}</button>`).join("");
+
+  function setChord(i, pop) {
+    const ch = A.byId[prog.chords[i % 4]], nx = A.byId[prog.chords[(i + 1) % 4]];
+    $("cc-name").textContent = ch.name; $("cc-box").innerHTML = A.box(ch);
+    $("cc-nname").textContent = nx.name; $("cc-nbox").innerHTML = A.box(nx, { fingers: false });
+    if (pop) { const c = $("cc-cur"); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
+    document.querySelectorAll(".cc-bar").forEach((b, k) => b.classList.toggle("on", k === i % 4));
+  }
+  function drawStatic() {
+    const beats = rh.p.length / 2;
+    $("cc-beats").innerHTML = "<i></i>".repeat(beats);
+    $("cc-strokes").innerHTML = [...rh.p].map((s) => `<i class="${s === "." ? "rest" : ""}">${s === "U" ? "↑" : s === "." ? "·" : "↓"}</i>`).join("");
+    $("cc-time").innerHTML = `<div class="cc-head" id="cc-head"></div>` + prog.chords.map((c) => `<div class="cc-bar">${c}</div>`).join("");
+    setChord(0, false);
+  }
+  drawStatic();
+
+  function stop() {
+    if (player) player.stop();
+    player = null;
+    $("cc-play").textContent = "▶︎"; $("cc-play").setAttribute("aria-label", "Hrát");
+    document.querySelectorAll("#cc-beats i, #cc-strokes i").forEach((x) => x.classList.remove("on"));
+    $("cc-head").style.transition = "none"; $("cc-head").style.left = "0";
+  }
+  function start() {
+    const L = rh.p.length, beats = L / 2;
+    round = 0;
+    let curBpm = bpm;
+    player = A.loop({
+      bpm: bpm * 2,
+      onBeat(n, when) {
+        const bar = Math.floor(n / L) - 1, k = n % L, s = rh.p[k];       // takt -1 = odpočítávání
+        if (bar < 0) { if (k % 2 === 0) A.click(when, k === 0); return; }
+        if (k === 0 && bar > 0 && bar % 4 === 0 && $("cc-up").checked) { curBpm = Math.min(160, curBpm + 4); player.setBpm(curBpm * 2); }
+        const ch = A.byId[prog.chords[bar % 4]];
+        if (s === "D") A.strum(ch, { when, vel: k === 0 ? 1 : 0.75, spread: 0.022 });
+        if (s === "d") A.strum(ch, { when, vel: 0.45, spread: 0.018 });
+        if (s === "U") A.strum(ch, { when, dir: "up", vel: 0.6, spread: 0.018 });
+      },
+      onShow(n) {
+        const bar = Math.floor(n / L) - 1, k = n % L;
+        if (bar < 0) {
+          if (k % 2 === 0) { const c = $("cc-count"); c.textContent = k / 2 + 1; c.classList.remove("on"); void c.offsetWidth; c.classList.add("on"); }
+          return;
+        }
+        if (k === 0) {
+          setChord(bar % 4, true);
+          if (bar % 4 === 0) round = bar / 4 + 1;
+          $("cc-stat").innerHTML = `Kolo <b>${round}</b> · <b>${curBpm} BPM</b>${$("cc-up").checked ? " · zrychluju" : ""}`;
+        }
+        document.querySelectorAll("#cc-beats i").forEach((x, j) => x.classList.toggle("on", k % 2 === 0 && j === k / 2));
+        document.querySelectorAll("#cc-strokes i").forEach((x, j) => x.classList.toggle("on", j === k && rh.p[k] !== "."));
+        // poslední doba taktu: upozorni na další akord
+        $("cc-next").classList.toggle("soon", k >= L - 2);
+        const head = $("cc-head"), pos = ((bar % 4) + (k + 1) / L) / 4;
+        if (bar % 4 === 0 && k === 0) { head.style.transition = "none"; head.style.left = "0"; void head.offsetWidth; }
+        head.style.transition = `left ${30 / curBpm}s linear`;
+        head.style.left = `calc(${pos * 100}% - 2px)`;
+      },
+    });
+    $("cc-play").textContent = "■"; $("cc-play").setAttribute("aria-label", "Zastavit");
+    $("cc-stat").textContent = "Raz, dva, tři, čtyři…";
+  }
+  $("cc-play").onclick = () => (player ? stop() : start());
+  $("cc-bpm").oninput = (e) => { bpm = +e.target.value; $("cc-bpmv").textContent = `${bpm} BPM`; if (player) player.setBpm(bpm * 2); };
+  $("cc-progs").addEventListener("click", (e) => {
+    const b = e.target.closest(".cc-prog"); if (!b) return;
+    prog = PROGS[+b.dataset.i];
+    document.querySelectorAll(".cc-prog").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    const was = !!player; stop(); drawStatic(); if (was) start();
+  });
+  $("cc-rh").addEventListener("click", (e) => {
+    const b = e.target.closest(".tab"); if (!b) return;
+    rh = RH.find((r) => r.id === b.dataset.id);
+    document.querySelectorAll("#cc-rh .tab").forEach((x) => x.setAttribute("aria-selected", x === b));
+    const was = !!player; stop(); drawStatic(); if (was) start();
+  });
+  document.addEventListener("keydown", (e) => { if (e.code === "Space" && e.target === document.body) { e.preventDefault(); $("cc-play").click(); } });
+
+  const nav = document.querySelector(".topnav");
+  $("nav-toggle").onclick = () => nav.classList.toggle("is-open");
+})();
+</script>
+</body>
+</html>

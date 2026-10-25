@@ -1,0 +1,20 @@
+/* Jen pro náhled návrhů: lišta s přepínáním návrhů a společné kousky. Na web se nepřenáší. */
+.proto{position:sticky;bottom:12px;z-index:30;margin:48px auto 0;max-width:max-content;display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;padding:6px;border-radius:999px;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);box-shadow:0 4px 24px rgba(0,0,0,.14);border:1px solid var(--line)}
+.proto a,.proto button{font:inherit;font-size:13px;font-weight:500;letter-spacing:0;padding:7px 14px;border-radius:999px;border:0;background:transparent;color:var(--ink);text-decoration:none;cursor:pointer;white-space:nowrap}
+.proto a[aria-current="page"]{background:var(--accent);color:#fff}
+.proto button{color:var(--muted)}
+.topnav a[aria-current="page"]{color:var(--accent);opacity:1;font-weight:600}
+.new-badge{font-size:10px;font-weight:700;color:#fff;background:var(--accent);border-radius:999px;padding:1px 6px;margin-left:5px;vertical-align:1px}
+
+.chordbox{display:block;width:100%;height:auto;color:var(--ink)}
+.chip{font:inherit;font-size:15px;font-weight:600;letter-spacing:-.01em;min-width:52px;padding:9px 14px;border-radius:999px;border:0;background:var(--surface);color:var(--ink);box-shadow:var(--shadow);cursor:pointer;transition:transform .15s ease,background .2s ease,color .2s ease}
+:root[data-theme="dark"] .chip{background:var(--sunk)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip{background:var(--sunk)}}
+.chip:hover{transform:scale(1.05)}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff}
+.chip:active{transform:scale(.96)}
+footer{margin-top:96px;text-align:center;color:var(--muted);font-size:13px}
+@media (max-width:600px){
+  .proto{position:static;border-radius:20px;margin-top:32px;max-width:100%}
+  .proto a,.proto button{font-size:12px;padding:6px 10px}
+}

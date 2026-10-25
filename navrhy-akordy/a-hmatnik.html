@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Akordy · návrh A · Hmatník</title>
+  <link rel="icon" href="../cloudflare/public/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../cloudflare/public/styles.css">
+  <link rel="stylesheet" href="navrhy.css">
+  <script src="akordy.js"></script>
+  <style>
+    .aa-stage{padding:clamp(20px,4vw,40px);gap:22px}
+    .aa-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .aa-name{font-family:var(--f-display);font-size:clamp(72px,12vw,128px);font-weight:700;line-height:.9;letter-spacing:-.05em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;transition:opacity .2s}
+    .aa-full{font-size:15px;color:var(--muted);margin-top:8px}
+    .aa-full b{color:var(--ink);font-weight:600}
+    .aa-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .aa-actions .btn-quiet,.aa-move .btn-quiet{background:var(--sunk);box-shadow:none}
+    .aa-move .btn-quiet{background:var(--surface)}
+    .aa-board{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;color:var(--ink)}
+    .aa-board svg{display:block;width:100%;height:auto;overflow:visible}
+    .aa-wood{fill:var(--sunk)}
+    .aa-fret{stroke:var(--muted);stroke-opacity:.45;stroke-width:2}
+    .aa-nut{fill:var(--ink)}
+    .aa-inlay{fill:var(--muted);fill-opacity:.25}
+    .aa-str line{stroke:currentColor;stroke-linecap:round;transition:stroke .3s,stroke-opacity .3s}
+    .aa-str.muted line{stroke-opacity:.25}
+    .aa-str.vib line{animation:vib .7s ease-out;stroke:var(--accent)}
+    .aa-str.v.vib line{animation-name:vibx}
+    @keyframes vibx{0%{transform:translateX(0)}8%{transform:translateX(2.6px)}16%{transform:translateX(-2.3px)}24%{transform:translateX(2px)}32%{transform:translateX(-1.6px)}44%{transform:translateX(1.1px)}58%{transform:translateX(-.6px)}100%{transform:translateX(0)}}
+    @keyframes vib{0%{transform:translateY(0)}8%{transform:translateY(2.6px)}16%{transform:translateY(-2.3px)}24%{transform:translateY(2px)}32%{transform:translateY(-1.6px)}44%{transform:translateY(1.1px)}58%{transform:translateY(-.6px)}100%{transform:translateY(0)}}
+    .aa-mark{font-size:20px;font-weight:600;fill:var(--muted);text-anchor:middle;dominant-baseline:central;transition:opacity .3s}
+    .aa-open{fill:none;stroke:var(--muted);stroke-width:2.2;transition:opacity .3s}
+    .aa-f{transition:transform .55s cubic-bezier(.34,1.4,.5,1),opacity .3s;transform-box:view-box}
+    .aa-f circle{fill:var(--accent);filter:drop-shadow(0 3px 6px rgba(0,113,227,.35))}
+    .aa-f text{fill:#fff;font-size:17px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+    .aa-f.off{opacity:0}
+    .aa-f.stay circle{fill:var(--ok)}
+    .aa-ghost{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:4 4;opacity:0;transition:opacity .4s}
+    .aa-ghost.on{opacity:.55}
+    .aa-barre{fill:var(--accent);opacity:0;transition:opacity .35s}
+    .aa-barre.on{opacity:.9}
+    .aa-ring{fill:none;stroke:var(--accent);stroke-width:2;animation:ring .7s ease-out forwards;transform-box:fill-box;transform-origin:center}
+    @keyframes ring{from{transform:scale(.4);opacity:.9}to{transform:scale(2.4);opacity:0}}
+    .aa-hint{font-size:13px;color:var(--muted);text-align:center}
+    .aa-move{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;background:var(--sunk);border-radius:var(--r);padding:18px 20px}
+    .aa-move h3{font-size:17px}
+    .aa-move ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;font-size:15px}
+    .aa-move li{display:flex;gap:10px;align-items:center}
+    .aa-move li i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-style:normal;font-size:12px;font-weight:700;display:grid;place-items:center}
+    .aa-move li.stay i{background:var(--ok)}
+    .aa-move .pair{font-family:var(--f-display);font-size:28px;font-weight:700;letter-spacing:-.03em;white-space:nowrap}
+    .aa-move .btn{margin-top:12px;font-size:15px;padding:9px 18px}
+    .aa-count{display:inline-flex;gap:6px;margin-left:10px;vertical-align:middle}
+    .aa-count i{width:9px;height:9px;border-radius:50%;background:var(--line);transition:background .1s}
+    .aa-count i.on{background:var(--accent)}
+    .aa-picker{display:grid;gap:18px}
+    .aa-group{display:grid;gap:10px;justify-items:center}
+    .aa-group .eyebrow{color:var(--muted)}
+    .aa-group div{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+    @media (max-width:600px){
+      .aa-board{max-width:330px;margin-inline:auto;width:100%}
+      .aa-head{flex-direction:column;align-items:flex-start}
+      .aa-move{grid-template-columns:1fr}
+      .aa-actions .btn{font-size:15px;padding:10px 18px}
+    }
+  </style>
+</head>
+<body>
+  <nav class="topnav" aria-label="Navigace">
+    <div class="in">
+      <b><a class="logo" href="#"><span>Joy To Play</span></a></b>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16"/><path d="M4 16h16"/></svg></button>
+      <div class="nav-links" id="nav-links">
+        <a href="#">Videa</a><a href="#">Zpěvník</a><a href="#akordy" aria-current="page">Akordy<span class="new-badge">Nové</span></a><a href="#">Sekce</a><a href="#">Kanály</a><a href="#">O mně</a><a href="#">Doporuč</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <section id="akordy">
+      <div class="sec-head">
+        <div class="eyebrow">Akordy</div>
+        <h2>Polož prsty. Brnkni.</h2>
+        <p class="lead">Klikni na akord a uvidíš, kam dát prsty. Pak přejeď přes struny a uslyšíš, jak má znít.</p>
+      </div>
+
+      <article class="tile aa-stage">
+        <div class="aa-head">
+          <div>
+            <div class="aa-name" id="aa-name">G</div>
+            <div class="aa-full" id="aa-full"></div>
+          </div>
+          <div class="aa-actions">
+            <button class="btn btn-primary" id="aa-strum" type="button">▶︎ Brnkni</button>
+            <button class="btn btn-quiet" id="aa-arp" type="button">Po strunách</button>
+          </div>
+        </div>
+        <div class="aa-board" id="aa-board" aria-label="Hmatník, přejeď po strunách"></div>
+        <p class="aa-hint">Přejeď prstem nebo myší přes struny. Každá zahraje svůj tón.</p>
+        <div class="aa-move" id="aa-move" hidden></div>
+      </article>
+
+      <div class="aa-picker" id="aa-picker"></div>
+    </section>
+
+    <footer>Joy To Play · Nauč se málo. Zahraj hodně.</footer>
+
+    <div class="proto">
+      <a href="index.html">Přehled</a>
+      <a href="a-hmatnik.html" aria-current="page">A · Hmatník</a>
+      <a href="b-odemkni.html">B · Odemkni písničky</a>
+      <a href="c-doprovod.html">C · Hraj s doprovodem</a>
+      <button type="button" data-theme-toggle></button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const A = window.Akordy;
+  // ---- hmatník: na šířku (počítač) nebo na výšku (mobil), stejná logika ----
+  const board = document.getElementById("aa-board");
+  const $ = (id) => document.getElementById(id);
+  let G;
+  function geometry(vertical) {
+    if (!vertical) {
+      const FX = [78, 196, 306, 408, 502, 588];
+      return { vertical, W: 640, H: 250, FW: FX, R: 17,
+        pos: (s, f) => [f === 0 ? 40 : (FX[f - 1] + FX[f]) / 2 + 6, 30 + (5 - s) * 38],
+        line: (s) => [78, 30 + (5 - s) * 38, 640, 30 + (5 - s) * 38],
+        fret: (k) => [FX[k], 14, FX[k], 236],
+        wood: [78, 12, 562, 226], nut: [73, 12, 8, 226],
+        inlay: (f) => [(FX[f - 1] + FX[f]) / 2, 106 + 19],
+        barre: (b) => { const [x] = [(FX[b.fret - 1] + FX[b.fret]) / 2 + 6]; const y1 = 30 + (5 - b.to) * 38 - 17, y2 = 30 + (5 - b.from) * 38 + 17; return [x - 17, y1, 34, y2 - y1]; },
+        coord: (e, r) => (((e.clientY - r.top) / r.height) * 250), sp: 38, at: (v) => 5 - Math.round((v - 30) / 38) };
+    }
+    const FY = [78, 178, 268, 350, 424, 492];
+    return { vertical, W: 340, H: 510, FW: FY, R: 19,
+      pos: (s, f) => [40 + s * 52, f === 0 ? 40 : (FY[f - 1] + FY[f]) / 2 + 6],
+      line: (s) => [40 + s * 52, 78, 40 + s * 52, 510],
+      fret: (k) => [16, FY[k], 324, FY[k]],
+      wood: [14, 78, 312, 432], nut: [14, 73, 312, 8],
+      inlay: (f) => [40 + 2.5 * 52, (FY[f - 1] + FY[f]) / 2],
+      barre: (b) => { const y = (FY[b.fret - 1] + FY[b.fret]) / 2 + 6; const x1 = 40 + b.from * 52 - 19, x2 = 40 + b.to * 52 + 19; return [x1, y - 19, x2 - x1, 38]; },
+      coord: (e, r) => (((e.clientX - r.left) / r.width) * 340), sp: 52, at: (v) => Math.round((v - 40) / 52) };
+  }
+  function build() {
+    const mq = matchMedia("(max-width:600px)").matches;
+    if (G && G.vertical === mq) return;
+    G = geometry(mq);
+    const svg = [`<svg viewBox="0 0 ${G.W} ${G.H}">`];
+    svg.push(`<rect class="aa-wood" x="${G.wood[0]}" y="${G.wood[1]}" width="${G.wood[2]}" height="${G.wood[3]}" rx="14"/>`);
+    [3, 5].forEach((f) => { const [x, y] = G.inlay(f); svg.push(`<circle class="aa-inlay" cx="${x}" cy="${y}" r="8"/>`); });
+    for (let k = 1; k <= 5; k++) { const [x1, y1, x2, y2] = G.fret(k); svg.push(`<line class="aa-fret" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`); }
+    svg.push(`<rect class="aa-nut" x="${G.nut[0]}" y="${G.nut[1]}" width="${G.nut[2]}" height="${G.nut[3]}" rx="3"/>`);
+    svg.push(`<rect class="aa-barre" id="aa-barre" x="0" y="0" width="0" height="0" rx="${G.R}"/>`);
+    for (let s = 0; s < 6; s++) {
+      const [x1, y1, x2, y2] = G.line(s), [ox, oy] = G.pos(s, 0);
+      svg.push(`<g class="aa-str${G.vertical ? " v" : ""}" id="str${s}"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${3.4 - s * 0.42}"/></g>`);
+      svg.push(`<circle class="aa-open" id="open${s}" cx="${ox}" cy="${oy}" r="9"/>`);
+      svg.push(`<text class="aa-mark" id="mute${s}" x="${ox}" y="${oy}">×</text>`);
+    }
+    for (let f = 1; f <= 4; f++) svg.push(`<circle class="aa-ghost" id="gh${f}" r="${G.R}" cx="0" cy="0"/>`);
+    for (let f = 1; f <= 4; f++) svg.push(`<g class="aa-f off" id="fi${f}" style="transform:translate(${G.W / 2}px,${G.H / 2}px)"><circle r="${G.R}"/><text>${f}</text></g>`);
+    svg.push(`<g id="aa-rings"></g></svg>`);
+    board.innerHTML = svg.join("");
+    if (cur) { const c = cur, p = prev; cur = p; show(c, true); }
+  }
+
+  // kde leží který prst; u barré dá prst 1 na konec barré
+  function fingerMap(ch) {
+    const m = {};
+    ch.frets.forEach((fr, s) => {
+      const fi = ch.fingers[s];
+      if (fr > 0 && fi && !m[fi]) m[fi] = { s, f: fr };
+    });
+    if (ch.barre) m[1] = { s: G && G.vertical ? ch.barre.from : ch.barre.to, f: ch.barre.fret, barre: true };
+    return m;
+  }
+
+  let cur = null, prev = null;
+  function show(ch, keepPrev) {
+    if (!keepPrev) prev = cur;
+    cur = ch;
+    $("aa-name").textContent = ch.name;
+    $("aa-full").innerHTML = `<b>${ch.full}</b> · tóny ${ch.notes}`;
+    const m = fingerMap(ch), pm = prev ? fingerMap(prev) : {};
+    for (let f = 1; f <= 4; f++) {
+      const el = $("fi" + f), p = m[f];
+      if (p) {
+        const [x, y] = G.pos(p.s, p.f);
+        el.classList.remove("off");
+        el.style.transform = `translate(${x}px,${y}px)`;
+        const q = pm[f];
+        el.classList.toggle("stay", !!(q && q.s === p.s && q.f === p.f));
+      } else el.classList.add("off");
+      const g = $("gh" + f), q = pm[f];
+      if (q) { const [x, y] = G.pos(q.s, q.f); g.setAttribute("cx", x); g.setAttribute("cy", y); }
+      g.classList.toggle("on", !!(q && !(p && p.s === q.s && p.f === q.f)));
+    }
+    const b = $("aa-barre");
+    if (ch.barre) { const [x, y, w, h] = G.barre(ch.barre); b.setAttribute("x", x); b.setAttribute("y", y); b.setAttribute("width", w); b.setAttribute("height", h); }
+    b.classList.toggle("on", !!ch.barre);
+    for (let s = 0; s < 6; s++) {
+      const fr = ch.frets[s];
+      $("open" + s).style.opacity = fr === 0 ? 1 : 0;
+      $("mute" + s).style.opacity = fr === -1 ? 1 : 0;
+      $("str" + s).classList.toggle("muted", fr === -1);
+    }
+    document.querySelectorAll("#aa-picker .chip").forEach((c) => c.setAttribute("aria-pressed", c.dataset.id === ch.id));
+    renderMove();
+  }
+
+  // ---- popis přechodu z minulého akordu ----
+  function describe(a, b) {
+    const ma = fingerMap(a), mb = fingerMap(b), out = [];
+    let moved = 0;
+    for (let f = 1; f <= 4; f++) {
+      const p = ma[f], q = mb[f];
+      if (!p && !q) continue;
+      let t, stay = false;
+      if (!p) { t = "přiložíš navíc"; moved++; }
+      else if (!q) t = "zvedneš";
+      else if (p.s === q.s && p.f === q.f) { t = "zůstává na místě, je to tvoje kotva"; stay = true; }
+      else if (p.s === q.s) { t = `sjede po stejné struně o ${Math.abs(p.f - q.f)} ${Math.abs(p.f - q.f) === 1 ? "pražec" : "pražce"}`; moved++; }
+      else if (p.f === q.f) { const d = Math.abs(p.s - q.s); t = `přeskočí ${d === 1 ? "na vedlejší strunu" : `o ${d} struny`}`; moved++; }
+      else { t = "se přesune jinam"; moved++; }
+      out.push({ f, t, stay });
+    }
+    const verdict = moved <= 1 ? "Pohodový přechod" : moved === 2 ? "Chce trochu cviku" : "Přehazuješ celou ruku";
+    return { out, verdict };
+  }
+  let practice = null;
+  function renderMove() {
+    const box = $("aa-move");
+    if (!prev || prev.id === cur.id) { box.hidden = true; return; }
+    const { out, verdict } = describe(prev, cur);
+    box.hidden = false;
+    box.innerHTML = `<div class="pair">${prev.name} → ${cur.name}</div>
+      <div><h3>${verdict}</h3>
+        <ul>${out.map((o) => `<li class="${o.stay ? "stay" : ""}"><i>${o.f}</i>${o.f}. prst ${o.t}</li>`).join("")}</ul>
+        <button class="btn btn-quiet" id="aa-practice" type="button">${practice ? "■ Stop" : `Procvič ${prev.name} ⇄ ${cur.name} pod metronomem`}</button><span class="aa-count" id="aa-count"><i></i><i></i><i></i><i></i></span>
+      </div>`;
+    $("aa-practice").onclick = togglePractice;
+  }
+  function togglePractice() {
+    if (practice) { practice.stop(); practice = null; renderMove(); return; }
+    const pair = [prev, cur];
+    practice = A.loop({
+      bpm: 72,
+      onBeat: (n, when) => {
+        const ch = pair[Math.floor(n / 4) % 2];
+        A.strum(ch, { when, vel: n % 4 === 0 ? 1 : 0.55, spread: 0.02 });
+      },
+      onShow: (n) => {
+        const ch = pair[Math.floor(n / 4) % 2];
+        if (n % 4 === 0 && ch !== cur) { const keep = practice; show(ch); practice = keep; renderMove(); }
+        const dots = document.querySelectorAll("#aa-count i");
+        dots.forEach((d, i) => d.classList.toggle("on", i === n % 4));
+        vibrateAll(ch, n % 4 === 0 ? 1 : 0.5);
+      },
+    });
+    $("aa-practice").textContent = "■ Stop";
+  }
+
+  // ---- zvuk a animace strun ----
+  function vib(s, delay = 0) {
+    setTimeout(() => {
+      const g = $("str" + s);
+      g.classList.remove("vib"); void g.getBBox(); g.classList.add("vib");
+      clearTimeout(g._t); g._t = setTimeout(() => g.classList.remove("vib"), 720);
+      const fr = cur.frets[s];
+      if (fr < 0) return;
+      const r = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      r.setAttribute("class", "aa-ring"); r.setAttribute("r", 14);
+      const [x, y] = G.pos(s, fr);
+      r.setAttribute("cx", x); r.setAttribute("cy", y);
+      $("aa-rings").appendChild(r);
+      setTimeout(() => r.remove(), 750);
+    }, delay * 1000);
+  }
+  function vibrateAll(ch) { ch.frets.forEach((fr, s) => fr >= 0 && vib(s, s * 0.02)); }
+  $("aa-strum").onclick = () => A.strum(cur).forEach(([s, t]) => vib(s, t));
+  $("aa-arp").onclick = () => {
+    const t0 = A.ensure().currentTime + 0.02;
+    const seq = cur.frets.map((f, s) => s).filter((s) => cur.frets[s] >= 0);
+    [...seq, ...seq.slice(0, -1).reverse()].forEach((s, k) => { A.pluck(s, cur.frets[s], t0 + k * 0.18); vib(s, k * 0.18); });
+  };
+  // tažení přes struny = brnknutí
+  let down = false, last = -1;
+  const stringAt = (e) => {
+    const v = G.coord(e, board.getBoundingClientRect()), s = G.at(v);
+    if (s < 0 || s > 5) return -1;
+    const [x, y] = G.pos(s, 1), c = G.vertical ? x : y;
+    return Math.abs(v - c) < G.sp * 0.45 ? s : -1;
+  };
+  const hit = (s) => { if (s < 0 || s === last) return; last = s; if (cur.frets[s] >= 0) { A.pluck(s, cur.frets[s]); vib(s); } };
+  board.addEventListener("pointerdown", (e) => { down = true; last = -1; board.setPointerCapture(e.pointerId); hit(stringAt(e)); });
+  board.addEventListener("pointermove", (e) => { if (down || e.pointerType === "mouse") { if (!down) { const s = stringAt(e); if (s !== last) last = -1; return; } hit(stringAt(e)); } });
+  board.addEventListener("pointerup", () => { down = false; last = -1; });
+  board.addEventListener("pointercancel", () => { down = false; });
+
+  // ---- výběr akordů ----
+  $("aa-picker").innerHTML = Object.entries(A.GROUPS).map(([g, label]) => `<div class="aa-group"><div class="eyebrow">${label}</div><div>${A.CHORDS.filter((c) => c.group == g).map((c) => `<button class="chip" type="button" data-id="${c.id}" aria-pressed="false">${c.name}</button>`).join("")}</div></div>`).join("");
+  $("aa-picker").addEventListener("click", (e) => {
+    const b = e.target.closest(".chip");
+    if (!b || b.dataset.id === cur.id) return;
+    if (practice) { practice.stop(); practice = null; }
+    show(A.byId[b.dataset.id]);
+    setTimeout(() => A.strum(cur).forEach(([s, t]) => vib(s, t)), 380);
+  });
+  build();
+  show(A.byId.G);
+  matchMedia("(max-width:600px)").addEventListener("change", build);
+
+  const nav = document.querySelector(".topnav");
+  $("nav-toggle").onclick = () => nav.classList.toggle("is-open");
+})();
+</script>
+</body>
+</html>
