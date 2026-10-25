@@ -17,8 +17,8 @@ Wrangler je nainstalovaný jen v této složce (`npm install`). Token se čte ze
 
 ```bash
 export CLOUDFLARE_API_TOKEN="$(cat ~/.config/joytoplay/cloudflare-token)"
-npx wrangler dev        # místní web na http://127.0.0.1:8787; heslo do místního adminu je v .dev.vars (ADMIN_PASSWORD)
-npx wrangler deploy     # nasazení na https://joytoplay.commercials1893.workers.dev
+npm run dev             # sestaví a spustí místní web (režim Pages) na http://127.0.0.1:8788; heslo do místního adminu je v .dev.vars
+npm run deploy:worker   # nasazení zkušebního Workeru na https://joytoplay.commercials1893.workers.dev
 npx wrangler d1 export joytoplay --remote --output zaloha.sql   # záloha databáze
 ```
 
@@ -30,6 +30,6 @@ Místní databáze: `npx wrangler d1 migrations apply joytoplay --local` a `npx 
 - **Heslo do správy**: tajný klíč Workeru `ADMIN_PASSWORD` (dashboard → Workers & Pages → joytoplay → Settings → Variables and secrets → Add, typ Secret).
   Bez něj `/admin/login` hlásí, že heslo chybí. Přihlášení platí 30 dní, změna hesla odhlásí všechna zařízení. Po 5 špatných pokusech z jedné adresy se přihlášení na 15 minut zablokuje (tabulka `login_attempts`).
   Cloudflare Access se nepoužívá: i tarif Zero Trust Free chce platební kartu a na doméně mimo DNS Cloudflare by admin nešel (rozhodnutí 2026-10-25).
-- **Vlastní doména**: Worker Custom Domain potřebuje doménu v DNS Cloudflare, DNS ale zůstává ve Wedosu.
-  Proto se pro kytara.tomasjindra.cz použije Cloudflare Pages (CNAME na `<projekt>.pages.dev` jde z cizího DNS).
-  Kód je na to připravený: `src/worker.js` používá jen `env.ASSETS` a `env.DB`, což funguje v Pages jako `_worker.js` stejně.
+- **Cloudflare Pages (ostrý web)**: projekt napojený na GitHub repo commercials1893/JoyToPlay, větev `main`, kořenová složka `cloudflare`,
+  build `npm run build`, výstup `public`. Vazby (D1, proměnné) bere z `wrangler.jsonc`, secrets `ADMIN_PASSWORD` a `TURNSTILE_SECRET` jsou v nastavení projektu.
+  Pages se nasadí samo po každém pushnutí na main. Doména kytara.tomasjindra.cz se napojí CNAME ve Wedosu na `<projekt>.pages.dev`.

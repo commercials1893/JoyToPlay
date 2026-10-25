@@ -63,9 +63,9 @@ async function route(request, env) {
     if (data) return respond(songPage(data, env));
   }
 
-  // Ostatní cesty zkusí statické soubory, jinak 404.
-  const asset = await env.ASSETS.fetch(request);
-  if (asset.status !== 404) return asset;
+  // Ostatní cesty zkusí statické soubory, jinak 404. Systémové soubory (_worker.js, .assetsignore) se neukazují.
+  const asset = /^\/[._]/.test(path) ? null : await env.ASSETS.fetch(request);
+  if (asset && asset.status !== 404) return asset;
   return respond(notFoundPage(env), { status: 404, cache: "no-store" });
 }
 

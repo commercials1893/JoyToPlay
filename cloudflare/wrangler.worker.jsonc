@@ -1,0 +1,19 @@
+{
+  // Zkušební Worker na workers.dev (nasazuje agent: npx wrangler deploy -c wrangler.worker.jsonc). Ostrý web je Pages, viz wrangler.jsonc.
+  "name": "joytoplay",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "account_id": "ce3b3fa05b85ae67893475ab2d6a4017",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": { "directory": "public", "binding": "ASSETS" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "joytoplay", "database_id": "d93ce5f6-7fb3-43c9-8f47-170b4962eaf5" }
+  ],
+  "vars": {
+    "SITE_URL": "https://kytara.tomasjindra.cz",
+    // Turnstile widget „Joy To Play formulář“ (adresy workers.dev a kytara.tomasjindra.cz). Tajný klíč je secret TURNSTILE_SECRET.
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAFlB1VM18DZCqfnm"
+  },
+  "observability": { "enabled": true }
+}
