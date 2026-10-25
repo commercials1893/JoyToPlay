@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "29";
+const ASSET_V = "30";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -227,6 +227,31 @@ export function homePage(data, env) {
           <div class="aa-move" id="aa-move" hidden></div>
         </article>
         <div class="aa-picker" id="aa-picker"></div>
+      </div>
+      <div class="cc" id="doprovod">
+        <div class="sec-head">
+          <div class="eyebrow">Hraj s doprovodem</div>
+          <h3 class="cc-title">Čtyři akordy. Spousta písniček.</h3>
+          <p class="lead">Vyber si postup, pusť doprovod a hraj s ním. Ukáže ti, co přijde, ještě než to přijde.</p>
+        </div>
+        <div class="cc-progs" id="cc-progs"></div>
+        <article class="tile cc-player">
+          <div class="cc-now">
+            <div class="cc-beats" id="cc-beats" aria-hidden="true"></div>
+            <div class="cc-cur" id="cc-cur"><div class="name" id="cc-name"></div><div id="cc-box"></div></div>
+            <div class="cc-next" id="cc-next"><small>Další</small><div class="name" id="cc-nname"></div><div id="cc-nbox"></div></div>
+          </div>
+          <div class="cc-time" id="cc-time"><div class="cc-head" id="cc-head"></div></div>
+          <div class="cc-strokes" id="cc-strokes" aria-hidden="true"></div>
+          <div class="cc-ctrl">
+            <button class="cc-play" id="cc-play" type="button" aria-label="Hrát">▶︎</button>
+            <div class="cc-tempo"><label for="cc-bpm">Tempo <b id="cc-bpmv">72 BPM</b></label><input id="cc-bpm" type="range" min="50" max="140" step="2" value="72"></div>
+            <div class="tabs cc-rh" id="cc-rh" aria-label="Rytmus"></div>
+            <label class="cc-opt"><input type="checkbox" id="cc-up"> Každé kolo o kousek rychleji</label>
+          </div>
+          <p class="cc-stat" id="cc-stat" aria-live="polite">Zmáčkni ▶︎. Nejdřív odpočítám čtyři doby.</p>
+          <div class="cc-count" id="cc-count" aria-hidden="true"></div>
+        </article>
       </div>
       <noscript><p class="lead" style="margin-inline:auto;text-align:center">Hmatník potřebuje zapnutý JavaScript.</p></noscript>
       <script src="/akordy.js?v=${ASSET_V}" defer></script>

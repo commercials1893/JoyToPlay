@@ -9,7 +9,7 @@ Dnešní statický web v kořeni repa (index.html, app.js, videos.json…) běž
 - `src/pages.js` HTML webu. Texty webu (úvod, O mně, …) jsou tady.
 - `src/data.js` dotazy do D1, `src/admin.js` správa, `src/session.js` přihlášení do správy heslem
 - `public/` CSS, skript pro prohlížeč, obrázky (styles.css je kopie z kořene + blok „Cloudflare verze“ na konci)
-- `public/akordy.js` sekce Akordy na úvodní stránce: hmatník s prstoklady, zvuk přes Web Audio (bez nahrávek), přechody mezi akordy. Styly jsou v bloku „Akordy“ na konci styles.css. Prototypy dalších návrhů jsou v `../navrhy-akordy/`.
+- `public/akordy.js` sekce Akordy na úvodní stránce: hmatník s prstoklady, zvuk přes Web Audio (bez nahrávek), přechody mezi akordy a pod tím „Hraj s doprovodem“ (postupy, rytmus, tempo). Styly jsou v blocích „Akordy“ na konci styles.css. Prototypy dalších návrhů jsou v `../navrhy-akordy/`.
 - `migrations/` schéma D1, `scripts/convert.mjs` převod videos.json a pisnicky.json do `data/seed.sql` (jednorázově, hotovo 2026-10-25)
 
 ## Příkazy

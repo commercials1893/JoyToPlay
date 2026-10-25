@@ -67,18 +67,30 @@
     src.start(t);
     src.stop(t + 3);
   }
-  // Brnknutí dolů (od basu). Vrací [struna, za kolik sekund zazní] pro animaci.
+  // Brnknutí: dolů od basu, nahoru (up) jen přes čtyři vyšší struny. Vrací [struna, za kolik sekund zazní] pro animaci.
   function strum(ch, opt = {}) {
     audio();
     const when = opt.when || ctx.currentTime + 0.01, spread = opt.spread ?? 0.028, vel = opt.vel ?? 1, times = [];
+    const order = opt.up ? [5, 4, 3, 2] : [0, 1, 2, 3, 4, 5];
     let k = 0;
-    ch.frets.forEach((fr, s) => {
+    order.forEach((s) => {
+      const fr = ch.frets[s];
       if (fr < 0) return;
       const t = when + k++ * spread;
       pluck(s, fr, t, vel);
       times.push([s, t - ctx.currentTime]);
     });
     return times;
+  }
+  function click(when, accent) {
+    audio();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = accent ? 1500 : 1000;
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.exponentialRampToValueAtTime(accent ? 0.3 : 0.15, when + 0.002);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + 0.05);
+    o.connect(g).connect(ctx.destination);
+    o.start(when); o.stop(when + 0.06);
   }
   // Metronom: zvuk se plánuje dopředu v Web Audio, obraz dostane callback ve chvíli, kdy doba zazní.
   function loop({ bpm, onBeat, onShow }) {
@@ -97,7 +109,36 @@
     };
     tick();
     const iv = setInterval(tick, 25);
-    return { stop() { alive = false; clearInterval(iv); timers.forEach(clearTimeout); } };
+    return {
+      stop() { alive = false; clearInterval(iv); timers.forEach(clearTimeout); },
+      setBpm(b) { bpm = b; },
+    };
+  }
+
+  // Malý diagram akordu na výšku, jak bývá ve zpěvnících.
+  function box(ch, fingers = true) {
+    const w = 120, h = 140, x0 = 18, y0 = 30, sx = (w - 2 * x0) / 5, sy = 24, s = [];
+    s.push(`<svg class="chordbox" viewBox="0 0 ${w} ${h}" role="img" aria-label="${ch.full}">`);
+    s.push(`<rect x="${x0 - 1}" y="${y0 - 4}" width="${5 * sx + 2}" height="4" rx="1.5" style="fill:currentColor"/>`);
+    for (let f = 1; f <= 4; f++) s.push(`<line x1="${x0}" x2="${x0 + 5 * sx}" y1="${y0 + f * sy}" y2="${y0 + f * sy}" stroke="currentColor" stroke-opacity=".25"/>`);
+    for (let i = 0; i < 6; i++) s.push(`<line x1="${x0 + i * sx}" x2="${x0 + i * sx}" y1="${y0}" y2="${y0 + 4 * sy}" stroke="currentColor" stroke-opacity=".55" stroke-width="${1.6 - i * 0.15}"/>`);
+    ch.frets.forEach((f, i) => {
+      const x = x0 + i * sx;
+      if (f === -1) s.push(`<text x="${x}" y="${y0 - 10}" text-anchor="middle" font-size="11">×</text>`);
+      if (f === 0) s.push(`<circle cx="${x}" cy="${y0 - 14}" r="3.6" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.3"/>`);
+    });
+    if (ch.barre) {
+      const b = ch.barre;
+      s.push(`<rect x="${x0 + b.from * sx - 8}" y="${y0 + (b.fret - 0.5) * sy - 8}" width="${(b.to - b.from) * sx + 16}" height="16" rx="8" style="fill:var(--accent)"/>`);
+    }
+    ch.frets.forEach((f, i) => {
+      if (f <= 0 || (ch.barre && f === ch.barre.fret && ch.fingers[i] === 1)) return;
+      const x = x0 + i * sx, y = y0 + (f - 0.5) * sy;
+      s.push(`<circle cx="${x}" cy="${y}" r="8.5" style="fill:var(--accent)"/>`);
+      if (fingers) s.push(`<text x="${x}" y="${y + 3.8}" text-anchor="middle" font-size="10.5" font-weight="600" style="fill:#fff">${ch.fingers[i]}</text>`);
+    });
+    s.push(`</svg>`);
+    return s.join("");
   }
 
   // ----- hmatník: na šířku (počítač) nebo na výšku (mobil), stejná logika -----
@@ -229,6 +270,7 @@
   function stopPractice() { if (practice) { practice.stop(); practice = null; } }
   function togglePractice() {
     if (practice) { stopPractice(); renderMove(); return; }
+    ccStop();
     const pair = [prev, cur];
     practice = loop({
       bpm: 72,
@@ -288,6 +330,102 @@
     show(byId[b.dataset.id]);
     setTimeout(strumNow, 380);
   });
+
+  // ----- Hraj s doprovodem: postup čtyř akordů, rytmus a tempo; web hraje a ukazuje, co přijde -----
+  const PROGS = [
+    { chords: ["G", "D", "Em", "C"], hint: "Táborák i rádio. Třeba Country Roads." },
+    { chords: ["C", "Am", "Dm", "G7"], hint: "Padesátky. Blue Moon a spol." },
+    { chords: ["Am", "Fmaj7", "C", "G"], hint: "Smutnější a s lehkým F." },
+    { chords: ["E", "A", "H7", "A"], hint: "Country a Johnny Cash." },
+    { chords: ["D", "A", "Hm", "G"], hint: "Až zvládneš barré. U2." },
+  ];
+  // osminy v taktu: D dolů, U nahoru, d lehce dolů, . pauza
+  const RH = [
+    { id: "down", label: "Dolů", p: "D.D.D.D." },
+    { id: "camp", label: "Táborák", p: "D.DU.UDU" },
+    { id: "waltz", label: "Valčík", p: "D.d.d." },
+  ];
+  let prog = PROGS[0], rh = RH[1], bpm = 72, tempo = 72, player = null;
+
+  $("cc-progs").innerHTML = PROGS.map((p, i) => `<button class="cc-prog" type="button" data-i="${i}" aria-pressed="${i === 0}"><b>${p.chords.join(" · ")}</b><span>${p.hint}</span></button>`).join("");
+  $("cc-rh").innerHTML = RH.map((r) => `<button class="tab" type="button" data-rh="${r.id}" aria-pressed="${r === rh}">${r.label}</button>`).join("");
+
+  function ccChord(i, pop) {
+    const ch = byId[prog.chords[i % 4]], nx = byId[prog.chords[(i + 1) % 4]];
+    $("cc-name").textContent = ch.id; $("cc-box").innerHTML = box(ch);
+    $("cc-nname").textContent = nx.id; $("cc-nbox").innerHTML = box(nx, false);
+    if (pop) { const c = $("cc-cur"); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
+    document.querySelectorAll(".cc-bar").forEach((b, k) => b.classList.toggle("on", k === i % 4));
+  }
+  function ccDraw() {
+    $("cc-beats").innerHTML = "<i></i>".repeat(rh.p.length / 2);
+    $("cc-strokes").innerHTML = [...rh.p].map((s) => `<i class="${s === "." ? "rest" : ""}">${s === "U" ? "↑" : s === "." ? "·" : "↓"}</i>`).join("");
+    $("cc-time").innerHTML = `<div class="cc-head" id="cc-head"></div>` + prog.chords.map((c) => `<div class="cc-bar">${c}</div>`).join("");
+    ccChord(0, false);
+  }
+  function ccStop() {
+    if (!player) return;
+    player.stop();
+    player = null;
+    $("cc-play").textContent = "▶︎"; $("cc-play").setAttribute("aria-label", "Hrát");
+    document.querySelectorAll("#cc-beats i, #cc-strokes i").forEach((x) => x.classList.remove("on"));
+    $("cc-next").classList.remove("soon");
+    $("cc-head").style.transition = "none"; $("cc-head").style.left = "0";
+    $("cc-stat").textContent = "Zmáčkni ▶︎. Nejdřív odpočítám čtyři doby.";
+  }
+  function ccStart() {
+    if (practice) { stopPractice(); renderMove(); }
+    const L = rh.p.length;
+    tempo = bpm;
+    player = loop({
+      bpm: bpm * 2,
+      onBeat(n, when) {
+        const bar = Math.floor(n / L) - 1, k = n % L, s = rh.p[k];   // takt -1 = odpočítávání
+        if (bar < 0) { if (k % 2 === 0) click(when, k === 0); return; }
+        if (k === 0 && bar > 0 && bar % 4 === 0 && $("cc-up").checked) { tempo = Math.min(160, tempo + 4); player.setBpm(tempo * 2); }
+        const ch = byId[prog.chords[bar % 4]];
+        if (s === "D") strum(ch, { when, vel: k === 0 ? 1 : 0.75, spread: 0.022 });
+        if (s === "d") strum(ch, { when, vel: 0.45, spread: 0.018 });
+        if (s === "U") strum(ch, { when, up: true, vel: 0.45, spread: 0.018 });
+      },
+      onShow(n) {
+        const bar = Math.floor(n / L) - 1, k = n % L;
+        if (bar < 0) {
+          if (k % 2 === 0) { const c = $("cc-count"); c.textContent = k / 2 + 1; c.classList.remove("on"); void c.offsetWidth; c.classList.add("on"); }
+          return;
+        }
+        if (k === 0) {
+          ccChord(bar % 4, true);
+          $("cc-stat").innerHTML = `Kolo <b>${Math.floor(bar / 4) + 1}</b> · <b>${tempo} BPM</b>${$("cc-up").checked ? " · zrychluju" : ""}`;
+        }
+        document.querySelectorAll("#cc-beats i").forEach((x, j) => x.classList.toggle("on", k % 2 === 0 && j === k / 2));
+        document.querySelectorAll("#cc-strokes i").forEach((x, j) => x.classList.toggle("on", j === k && rh.p[k] !== "."));
+        $("cc-next").classList.toggle("soon", k >= L - 2);
+        const head = $("cc-head");
+        if (bar % 4 === 0 && k === 0) { head.style.transition = "none"; head.style.left = "0"; void head.offsetWidth; }
+        head.style.transition = `left ${30 / tempo}s linear`;
+        head.style.left = `calc(${(((bar % 4) + (k + 1) / L) / 4) * 100}% - 2px)`;
+      },
+    });
+    $("cc-play").textContent = "■"; $("cc-play").setAttribute("aria-label", "Zastavit");
+    $("cc-stat").textContent = "Raz, dva, tři, čtyři…";
+  }
+  const restart = () => { const was = !!player; ccStop(); ccDraw(); if (was) ccStart(); };
+  $("cc-play").onclick = () => (player ? ccStop() : ccStart());
+  $("cc-bpm").oninput = (e) => { bpm = +e.target.value; $("cc-bpmv").textContent = `${bpm} BPM`; tempo = bpm; if (player) player.setBpm(tempo * 2); };
+  $("cc-progs").addEventListener("click", (e) => {
+    const b = e.target.closest(".cc-prog"); if (!b) return;
+    prog = PROGS[+b.dataset.i];
+    document.querySelectorAll(".cc-prog").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    restart();
+  });
+  $("cc-rh").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-rh]"); if (!b) return;
+    rh = RH.find((r) => r.id === b.dataset.rh);
+    document.querySelectorAll("#cc-rh [data-rh]").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    restart();
+  });
+  ccDraw();
 
   build();
   show(byId.G);
