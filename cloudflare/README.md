@@ -24,6 +24,8 @@ npm run deploy:worker   # nasazení zkušebního Workeru na https://joytoplay.co
 npx wrangler d1 export joytoplay --remote --output zaloha.sql   # záloha databáze
 ```
 
+Akordy u videí (sloupce chords, barre, capo, lang z migrace 0003) se upravují v adminu u videa. Počáteční data: `data/2026-10-25-akordy-videi.sql`.
+
 Místní databáze: `npx wrangler d1 migrations apply joytoplay --local` a `npx wrangler d1 execute joytoplay --local --file data/seed.sql`.
 
 ## Nastavení, které ještě chybí

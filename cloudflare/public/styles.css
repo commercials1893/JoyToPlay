@@ -676,3 +676,8 @@ svg text.lt-lbl{font-size:12px;fill:var(--muted);text-anchor:middle}
 .time-note a{color:var(--accent);text-decoration:none}
 .time-note.is-left{text-align:left;margin-top:8px}
 .empty a{color:var(--accent)}
+.chordline{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:var(--muted)}
+.chordline span{margin-right:2px}
+.chordline a{font-weight:700;font-size:14px;color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:3px 9px;text-decoration:none}
+.chordline a:hover{background:var(--accent);color:#fff}
+.chordline i{font-style:normal;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:3px 9px}

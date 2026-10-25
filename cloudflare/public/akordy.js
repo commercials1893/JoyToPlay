@@ -433,6 +433,8 @@
   ccDraw();
 
   build();
-  show(byId.G);
+  // Odkaz z karty videa: /akordy?akord=Em otevře rovnou ten akord.
+  const wanted = byId[new URLSearchParams(location.search).get("akord")];
+  show(wanted || byId.G);
   MOBILE.addEventListener("change", build);
 })();

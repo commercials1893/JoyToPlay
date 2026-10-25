@@ -19,12 +19,20 @@ function thumbHTML(video) {
       </a>`;
 }
 
+// Akordy z videa, každý vede na hmatník v Akordech (stejně jako chordLine v src/pages.js).
+function chordLine(video) {
+  if (!video.chords) return "";
+  const list = video.chords.split(/\s+/).filter(Boolean);
+  return `<div class="chordline"><span>Akordy</span>${list.map((c) => `<a href="/akordy?akord=${encodeURIComponent(c)}">${esc(c)}</a>`).join("")}${video.barre ? "<i>barré</i>" : ""}${video.capo ? `<i>kapodastr ${video.capo}. pražec</i>` : ""}</div>`;
+}
+
 function cardHTML(video) {
   return `
     <article class="video-card" data-cats="${esc(video.categories.join(" "))}" data-top="${video.top}">${thumbHTML(video)}
       <div class="card-body">
         <h3><a href="/video/${esc(video.slug)}">${esc(video.song)}</a></h3>
         <p class="by">${esc(video.channel)}</p>
+        ${chordLine(video)}
         <div class="facts">
           <span><span class="lvl" aria-hidden="true">${lvl(video.difficulty)}</span>Obtížnost <b>${video.difficulty}/5 · ${LEVELS[video.difficulty]}</b></span>
           <span>Čas <b>${esc(video.time)}</b></span>

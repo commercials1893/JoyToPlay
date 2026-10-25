@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "35";
+const ASSET_V = "36";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -88,8 +88,15 @@ function thumb(v, eager = false) {
 // Odhad času u videa počítá se základními otevřenými akordy; věta stojí u katalogu i na detailu.
 const TIME_NOTE = `Čas u videa platí, pokud už zvládáš základní otevřené akordy G, C, D, Em a Am. Vyzkoušet si je můžeš v <a href="/akordy">Akordech</a>.`;
 
+// Akordy z videa (po schválení dat 2026-10-25); každý vede na hmatník v Akordech. Barré a kapodastr jen když je to potřeba.
+function chordLine(v) {
+  if (!v.chords) return "";
+  const list = v.chords.split(/\s+/).filter(Boolean);
+  return `<div class="chordline"><span>Akordy</span>${list.map((c) => `<a href="/akordy?akord=${encodeURIComponent(c)}">${esc(c)}</a>`).join("")}${v.barre ? `<i>barré</i>` : ""}${v.capo ? `<i>kapodastr ${v.capo}. pražec</i>` : ""}</div>`;
+}
+
 function facts(v) {
-  return `<div class="facts">
+  return `${chordLine(v)}<div class="facts">
           <span><span class="lvl" aria-hidden="true">${lvl(v.difficulty)}</span>Obtížnost <b>${v.difficulty}/5 · ${LEVELS[v.difficulty]}</b></span>
           <span>Čas <b>${esc(v.time)}</b></span>
         </div>`;
@@ -127,6 +134,7 @@ export function homePage(data, env) {
     videos: data.videos.map((v) => ({
       id: v.youtube_id, slug: v.slug, title: v.title, song: v.song, artist: v.artist, channel: v.channel,
       difficulty: v.difficulty, time: v.time, categories: v.categories, top: !!v.top, comment: v.comment, added: v.added,
+      chords: v.chords || "", barre: !!v.barre, capo: v.capo || 0,
     })),
   };
   const body = `
