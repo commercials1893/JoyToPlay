@@ -26,8 +26,7 @@ Místní databáze: `npx wrangler d1 migrations apply joytoplay --local` a `npx 
 
 ## Nastavení, které ještě chybí
 
-- **Turnstile**: teď je v `wrangler.jsonc` testovací klíč (projde vždy). Ostrý widget pro `kytara.tomasjindra.cz` a zkušební adresu,
-  site key do `TURNSTILE_SITE_KEY`, tajný klíč přes `npx wrangler secret put TURNSTILE_SECRET`.
+- **Turnstile**: widget „Joy To Play formulář“ (2026-10-25), site key ve `wrangler.jsonc`, tajný klíč je secret `TURNSTILE_SECRET` (nastavuje Tomáš v dashboardu). Až se přidá adresa Pages, doplnit ji do widgetu.
 - **Heslo do správy**: tajný klíč Workeru `ADMIN_PASSWORD` (dashboard → Workers & Pages → joytoplay → Settings → Variables and secrets → Add, typ Secret).
   Bez něj `/admin/login` hlásí, že heslo chybí. Přihlášení platí 30 dní, změna hesla odhlásí všechna zařízení. Po 5 špatných pokusech z jedné adresy se přihlášení na 15 minut zablokuje (tabulka `login_attempts`).
   Cloudflare Access se nepoužívá: i tarif Zero Trust Free chce platební kartu a na doméně mimo DNS Cloudflare by admin nešel (rozhodnutí 2026-10-25).

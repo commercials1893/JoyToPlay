@@ -12,8 +12,8 @@
   ],
   "vars": {
     "SITE_URL": "https://kytara.tomasjindra.cz",
-    // Turnstile: zatím testovací klíč Cloudflare (projde vždy). Ostrý klíč doplní Tomáš po založení widgetu.
-    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA"
+    // Turnstile widget „Joy To Play formulář“ (adresy workers.dev a kytara.tomasjindra.cz). Tajný klíč je secret TURNSTILE_SECRET.
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAFlB1VM18DZCqfnm"
   },
   "observability": { "enabled": true }
 }
