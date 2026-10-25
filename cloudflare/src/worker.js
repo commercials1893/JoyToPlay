@@ -1,6 +1,6 @@
 // Joy To Play: veřejný web, formulář tipů a /admin. Statické soubory (CSS, JS, obrázky) jdou z public/ přes ASSETS.
 import { loadSite, loadVideo, loadSong, loadSitemap } from "./data.js";
-import { homePage, videoPage, songPage, notFoundPage, sitemap } from "./pages.js";
+import { homePage, songbookPage, chordsPage, channelsPage, aboutPage, recommendPage, videoPage, songPage, notFoundPage, sitemap } from "./pages.js";
 import { handleAdmin } from "./admin.js";
 
 // Testovací tajný klíč Cloudflare k testovacímu site key 1x000…AA (projde vždy).
@@ -49,7 +49,11 @@ async function route(request, env) {
   if (request.method !== "GET" && request.method !== "HEAD") return respond("", { status: 405 });
 
   if (path === "/") return respond(homePage(await loadSite(env.DB), env));
-  if (path === "/zpevnik") return Response.redirect(`${url.origin}/#zpevnik`, 301);
+  if (path === "/zpevnik") return respond(songbookPage(await loadSite(env.DB), env));
+  if (path === "/akordy") return respond(chordsPage(env));
+  if (path === "/kanaly") return respond(channelsPage(await loadSite(env.DB), env));
+  if (path === "/o-mne") return respond(aboutPage(env));
+  if (path === "/doporuc") return respond(recommendPage(env));
   if (path === "/sitemap.xml") return respond(sitemap(await loadSitemap(env.DB), env), { type: "application/xml; charset=utf-8", cache: "public, max-age=3600" });
 
   let match = path.match(/^\/video\/([a-z0-9-]+)$/);

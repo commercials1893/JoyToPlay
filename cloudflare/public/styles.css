@@ -610,3 +610,8 @@ footer{margin-top:64px}
   .cc-strokes i{width:22px}
 }
   
+
+/* ===== Samostatné stránky (zpěvník, akordy, kanály, o mně, doporuč) ===== */
+.page{padding-block:72px 0}
+.page h1{font-size:clamp(32px,5vw,56px);line-height:1.07}
+.page .tile h1{font-size:clamp(28px,3.4vw,40px);line-height:1.1}

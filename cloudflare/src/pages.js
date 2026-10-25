@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "31";
+const ASSET_V = "32";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -13,9 +13,11 @@ const ytUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 // Data pro skript v prohlížeči; "<" se escapuje, aby text nemohl ukončit <script>.
 const json = (data) => JSON.stringify(data).replace(/</g, "\\u003c");
 
-function nav(home) {
-  const h = home ? "" : "/";
-  const links = [["videa", "Videa"], ["zpevnik", "Zpěvník"], ["akordy", "Akordy"], ["sekce", "Sekce"], ["kanaly", "Kanály"], ["tj", "O mně"], ["doporuc", "Doporuč"]];
+function nav(home, path) {
+  const links = [
+    [home ? "#videa" : "/#videa", "Videa"], ["/zpevnik", "Zpěvník"], ["/akordy", "Akordy"],
+    [home ? "#sekce" : "/#sekce", "Sekce"], ["/kanaly", "Kanály"], ["/o-mne", "O mně"], ["/doporuc", "Doporuč"],
+  ];
   return `
   <nav class="topnav" aria-label="Navigace">
     <div class="in">
@@ -32,7 +34,7 @@ function nav(home) {
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16"/><path d="M4 16h16"/></svg>
       </button>
       <div class="nav-links" id="nav-links">
-        ${links.map(([id, label]) => `<a href="${h}#${id}">${label}</a>`).join("\n        ")}
+        ${links.map(([href, label]) => `<a href="${href}"${href === path ? ' aria-current="page"' : ""}>${label}</a>`).join("\n        ")}
       </div>
     </div>
   </nav>`;
@@ -65,7 +67,7 @@ function layout({ title = DEFAULT_TITLE, description = DEFAULT_DESC, path = "/",
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css?v=${ASSET_V}">
 </head>
-<body>${nav(home)}
+<body>${nav(home, path)}
 ${body}
   <script data-goatcounter="https://doc1893.goatcounter.com/count"
           async src="https://gc.zgo.at/count.js"></script>
@@ -114,8 +116,6 @@ export function homePage(data, env) {
       id: v.youtube_id, slug: v.slug, title: v.title, song: v.song, channel: v.channel,
       difficulty: v.difficulty, time: v.time, categories: v.categories, top: !!v.top, comment: v.comment, added: v.added,
     })),
-    songs: data.songs.map((s) => ({ slug: s.slug, artist: s.artist, song: s.song, url: s.chords_url, note: s.note, video: s.video_slug })),
-    turnstile: env.TURNSTILE_SITE_KEY || "",
   };
   const body = `
   <div class="wrap" id="top">
@@ -128,7 +128,7 @@ export function homePage(data, env) {
           <p class="intro">Nejsem kytarová škola. Jen sdílím videa, podle kterých se dá zahrát něco, co je celkem snadné a hezky to zní. Pro lidi, kteří mají práci, rodinu a na kytaru pár volných večerů.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#katalog" data-jump="start">Začni dnes</a>
-            <a class="btn btn-quiet" href="#tj">O mně</a>
+            <a class="btn btn-quiet" href="/o-mne">O mně</a>
           </div>
         </div>
         <img class="hero-guitar" src="/assets/kytara-ll16.jpg" alt="Yamaha LL16, akustická kytara Joy To Play">
@@ -173,12 +173,6 @@ export function homePage(data, env) {
       <button class="btn btn-quiet" id="videos-more" type="button" hidden></button>
     </section>
 
-    <section class="quote">
-      <div class="sec-head">
-        <h2>Kytara není závod. Je to radost.</h2>
-      </div>
-    </section>
-
     <section id="sekce">
       <div class="sec-head">
         <h2>Kam se vydat</h2>
@@ -192,9 +186,34 @@ export function homePage(data, env) {
       </div>
     </section>
 
-    <section id="zpevnik" hidden>
+    ${footer}
+  </div>
+  <script type="application/json" id="site-data">${json(clientData)}</script>`;
+  return layout({ site: env.SITE_URL, body, home: true });
+}
+
+// Samostatné stránky (zpěvník, akordy, kanály, o mně, doporuč). Úvod zůstává jen pro videa.
+function page(env, { path, title, description, body, data }) {
+  return layout({
+    site: env.SITE_URL, path, title: `${title} · Joy To Play`, description,
+    body: `
+  <div class="wrap" id="top">
+${body}
+    ${footer}
+  </div>${data ? `
+  <script type="application/json" id="site-data">${json(data)}</script>` : ""}`,
+  });
+}
+
+export function songbookPage(data, env) {
+  return page(env, {
+    path: "/zpevnik", title: "Zpěvník",
+    description: "Písničky, které TJ hraje nejradši, s odkazy na akordy. Pro kytaru jen tak pro radost.",
+    data: { songs: data.songs.map((s) => ({ slug: s.slug, artist: s.artist, song: s.song, url: s.chords_url, note: s.note, video: s.video_slug })) },
+    body: `
+    <section id="zpevnik" class="page" hidden>
       <div class="sec-head">
-        <h2>Můj zpěvník</h2>
+        <h1>Můj zpěvník</h1>
         <p class="lead">Písničky, které hraju nejradši. Akordy jsou na Ultimate Guitar, stačí kliknout.</p>
       </div>
       <div class="controls">
@@ -202,12 +221,19 @@ export function homePage(data, env) {
         <div class="artist-chips" id="song-chips"></div>
       </div>
       <div class="songs" id="songs"></div>
-    </section>
+    </section>`,
+  });
+}
 
-    <section id="akordy">
+export function chordsPage(env) {
+  return page(env, {
+    path: "/akordy", title: "Akordy na kytaru",
+    description: "Interaktivní hmatník: kam dát prsty, jak akord zní a jak přejít z akordu na akord. A doprovod, se kterým si zahraješ.",
+    body: `
+    <section id="akordy" class="page">
       <div class="sec-head">
         <div class="eyebrow">Akordy</div>
-        <h2>Polož prsty. Brnkni.</h2>
+        <h1>Polož prsty. Brnkni.</h1>
         <p class="lead">Klikni na akord a uvidíš, kam dát prsty. Pak přejeď přes struny a uslyšíš, jak má znít.</p>
       </div>
       <div id="akordy-app">
@@ -255,11 +281,18 @@ export function homePage(data, env) {
       </div>
       <noscript><p class="lead" style="margin-inline:auto;text-align:center">Hmatník potřebuje zapnutý JavaScript.</p></noscript>
       <script src="/akordy.js?v=${ASSET_V}" defer></script>
-    </section>
+    </section>`,
+  });
+}
 
-    <section id="kanaly">
+export function channelsPage(data, env) {
+  return page(env, {
+    path: "/kanaly", title: "Doporučené kanály",
+    description: "Kytarové kanály na YouTube, ke kterým se vyplatí vracet.",
+    body: `
+    <section id="kanaly" class="page">
       <div class="sec-head">
-        <h2>Doporučené kanály</h2>
+        <h1>Doporučené kanály</h1>
         <p class="lead">Když už jsi na YouTube, k těmhle lidem se vyplatí vracet.</p>
       </div>
       <div class="channels">
@@ -269,13 +302,20 @@ export function homePage(data, env) {
         </a>`).join("\n        ")}
       </div>
       <p class="thanks">Díky všem, kdo ta videa točí. Je za nimi spousta práce a moc si jí vážím. Když ti některé pomůže, dej autorovi lajk nebo odběr.</p>
-    </section>
+    </section>`,
+  });
+}
 
-    <section id="tj">
+export function aboutPage(env) {
+  return page(env, {
+    path: "/o-mne", title: "O mně",
+    description: "Kdo je TJ a proč Joy To Play vzniklo. Kytara jen tak pro radost.",
+    body: `
+    <section id="tj" class="page">
       <div class="about-grid">
         <article class="tile">
           <div class="eyebrow">O mně</div>
-          <h2>Nejsem učitel ani virtuóz</h2>
+          <h1>Nejsem učitel ani virtuóz</h1>
           <p>Na kytaru hraju asi 30 let. S dlouhými pauzami, ale vždycky jsem se k ní vrátil.</p>
           <p>Mám práci a běžný život jako ty, takže tu najdeš jen to, co se dá zvládnout a udělá radost.</p>
           <p>Hraju na Yamahu LL16 a Epiphone Dove Studio.</p>
@@ -305,10 +345,32 @@ export function homePage(data, env) {
       </div>
     </section>
 
-    <section id="doporuc">
+    <section class="quote">
+      <div class="sec-head">
+        <h2>Kytara není závod. Je to radost.</h2>
+      </div>
+    </section>
+
+    <section>
+      <div class="decide">
+        <div class="eyebrow">Proč to dělám</div>
+        <h2>Nejde mi o návštěvnost.</h2>
+        <p class="lead" style="color:#A1A1A6">Stačí, když si po práci vezmeš kytaru, najdeš tu jednu věc a udělá ti radost.</p>
+      </div>
+    </section>`,
+  });
+}
+
+export function recommendPage(env) {
+  return page(env, {
+    path: "/doporuc", title: "Doporuč video",
+    description: "Pošli TJ tip na video, podle kterého se dá zahrát něco hezkého.",
+    data: { turnstile: env.TURNSTILE_SITE_KEY || "" },
+    body: `
+    <section id="doporuc" class="page">
       <div class="sec-head">
         <div class="eyebrow">Máš tip?</div>
-        <h2>Doporuč video</h2>
+        <h1>Doporuč video</h1>
         <p class="lead">Našel jsi video, podle kterého to jde a hezky to zní? Pošli mi ho. Podívám se a ta nejlepší sem přidám.</p>
       </div>
       <div class="tile form-tile">
@@ -321,20 +383,8 @@ export function homePage(data, env) {
         </form>
         <p id="recommend-note" hidden></p>
       </div>
-    </section>
-
-    <section>
-      <div class="decide">
-        <div class="eyebrow">Proč to dělám</div>
-        <h2>Nejde mi o návštěvnost.</h2>
-        <p class="lead" style="color:#A1A1A6">Stačí, když si po práci vezmeš kytaru, najdeš tu jednu věc a udělá ti radost.</p>
-      </div>
-    </section>
-
-    ${footer}
-  </div>
-  <script type="application/json" id="site-data">${json(clientData)}</script>`;
-  return layout({ site: env.SITE_URL, body, home: true });
+    </section>`,
+  });
 }
 
 export function videoPage({ video: v, categories, songs, related }, env) {
@@ -385,7 +435,7 @@ export function songPage({ song: s, video: v, others }, env) {
       </div>
       <div class="detail-actions is-center">
         <a class="btn btn-primary" href="${esc(s.chords_url)}" target="_blank" rel="noreferrer">Akordy na Ultimate Guitar</a>
-        <a class="btn btn-quiet" href="/#zpevnik">Celý zpěvník</a>
+        <a class="btn btn-quiet" href="/zpevnik">Celý zpěvník</a>
       </div>
       ${v ? `<div class="videos is-single">${card(v)}</div>` : ""}
     </section>
@@ -423,7 +473,7 @@ export function sitemap({ videos, songs }, env) {
   const url = (path, lastmod) => `  <url>\n    <loc>${site}${path}</loc>${lastmod ? `\n    <lastmod>${lastmod.slice(0, 10)}</lastmod>` : ""}\n  </url>`;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${[url("/"), ...videos.map((v) => url(`/video/${v.slug}`, v.added)), ...songs.map((s) => url(`/pisen/${s.slug}`))].join("\n")}
+${[url("/"), ...["/zpevnik", "/akordy", "/kanaly", "/o-mne", "/doporuc"].map((p) => url(p)), ...videos.map((v) => url(`/video/${v.slug}`, v.added)), ...songs.map((s) => url(`/pisen/${s.slug}`))].join("\n")}
 </urlset>
 `;
 }

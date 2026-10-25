@@ -263,7 +263,7 @@ function songGroup(artist, list) {
 // Zpěvník: odkazy na akordy, samotné akordy na webu nejsou. Bez písniček se sekce neukáže.
 function initSongs(songs) {
   if (!songs.length) {
-    document.querySelector('.topnav a[href="#zpevnik"]').hidden = true;
+    document.querySelector('.topnav a[href="/zpevnik"]').hidden = true;
     return;
   }
   const root = document.getElementById("songs");
@@ -367,13 +367,25 @@ function bindNav() {
   });
 }
 
+// Zpěvník, akordy, kanály, o mně a doporučení mají od 2026-10-25 vlastní stránky; staré odkazy /#zpevnik apod. vedou tam.
+const MOVED = { zpevnik: "/zpevnik", akordy: "/akordy", kanaly: "/kanaly", tj: "/o-mne", doporuc: "/doporuc" };
+
+function redirectMoved() {
+  const moved = location.pathname === "/" && MOVED[location.hash.slice(1)];
+  if (moved) location.replace(moved);
+  return !!moved;
+}
+
 function init() {
+  if (redirectMoved()) return;
+  window.addEventListener("hashchange", redirectMoved);
   bindNav();
   bindPlayer();
-  // Detail videa a písničky nemá katalog ani formulář.
+  // Každá stránka dostane jen svoje data: úvod videa, zpěvník písničky, doporučení klíč Turnstile. Detail videa a písničky nic.
   if (!SITE) return;
-  bindForm();
-  initSongs(SITE.songs);
+  if (document.getElementById("recommend-form")) bindForm();
+  if (SITE.songs) initSongs(SITE.songs);
+  if (!SITE.videos) return;
   const videos = SITE.videos;
   bindFilters(videos);
   // Odkaz z detailu videa (/?f=three#videa) otevře rovnou danou sekci.
