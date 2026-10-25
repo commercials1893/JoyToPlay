@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "28";
+const ASSET_V = "29";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -15,7 +15,7 @@ const json = (data) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 function nav(home) {
   const h = home ? "" : "/";
-  const links = [["videa", "Videa"], ["zpevnik", "Zpěvník"], ["sekce", "Sekce"], ["kanaly", "Kanály"], ["tj", "O mně"], ["doporuc", "Doporuč"]];
+  const links = [["videa", "Videa"], ["zpevnik", "Zpěvník"], ["akordy", "Akordy"], ["sekce", "Sekce"], ["kanaly", "Kanály"], ["tj", "O mně"], ["doporuc", "Doporuč"]];
   return `
   <nav class="topnav" aria-label="Navigace">
     <div class="in">
@@ -202,6 +202,34 @@ export function homePage(data, env) {
         <div class="artist-chips" id="song-chips"></div>
       </div>
       <div class="songs" id="songs"></div>
+    </section>
+
+    <section id="akordy">
+      <div class="sec-head">
+        <div class="eyebrow">Akordy</div>
+        <h2>Polož prsty. Brnkni.</h2>
+        <p class="lead">Klikni na akord a uvidíš, kam dát prsty. Pak přejeď přes struny a uslyšíš, jak má znít.</p>
+      </div>
+      <div id="akordy-app">
+        <article class="tile aa-stage">
+          <div class="aa-head">
+            <div>
+              <div class="aa-name" id="aa-name">G</div>
+              <div class="aa-full" id="aa-full"></div>
+            </div>
+            <div class="aa-actions">
+              <button class="btn btn-primary" id="aa-strum" type="button">▶︎ Brnkni</button>
+              <button class="btn btn-quiet" id="aa-arp" type="button">Po strunách</button>
+            </div>
+          </div>
+          <div class="aa-board" id="aa-board" role="img" aria-label="Hmatník"></div>
+          <p class="aa-hint">Přejeď prstem nebo myší přes struny. Každá zahraje svůj tón.</p>
+          <div class="aa-move" id="aa-move" hidden></div>
+        </article>
+        <div class="aa-picker" id="aa-picker"></div>
+      </div>
+      <noscript><p class="lead" style="margin-inline:auto;text-align:center">Hmatník potřebuje zapnutý JavaScript.</p></noscript>
+      <script src="/akordy.js?v=${ASSET_V}" defer></script>
     </section>
 
     <section id="kanaly">
