@@ -20,6 +20,7 @@
     { id: "A7", full: "A septakord", frets: [-1, 0, 2, 0, 2, 0], fingers: [0, 0, 2, 0, 3, 0], notes: "A · Cis · E · G", group: 2 },
     { id: "C7", full: "C septakord", frets: [-1, 3, 2, 3, 1, 0], fingers: [0, 3, 2, 4, 1, 0], notes: "C · E · G · B", group: 3 },
     { id: "H7", full: "H septakord", frets: [-1, 2, 1, 2, 0, 2], fingers: [0, 2, 1, 3, 0, 4], notes: "H · Dis · Fis · A", group: 3 },
+    { id: "C2", full: "C2 (Cadd9)", frets: [-1, 3, 2, 0, 3, 3], fingers: [0, 2, 1, 0, 3, 4], notes: "C · D · E · G", group: 3 },
     { id: "Fmaj7", full: "F maj7 (lehké F)", frets: [-1, -1, 3, 2, 1, 0], fingers: [0, 0, 3, 2, 1, 0], notes: "F · A · C · E", group: 3 },
     { id: "F", full: "F dur (barré)", frets: [1, 3, 3, 2, 1, 1], fingers: [1, 3, 4, 2, 1, 1], barre: { fret: 1, from: 0, to: 5 }, notes: "F · A · C", group: 3 },
     { id: "Hm", full: "H moll (barré)", frets: [-1, 2, 4, 4, 3, 2], fingers: [0, 1, 3, 4, 2, 1], barre: { fret: 2, from: 1, to: 5 }, notes: "H · D · Fis", group: 3 },
