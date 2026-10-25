@@ -1,0 +1,40 @@
+/* Správa Joy To Play: jednoduché seznamy a formuláře nad tokeny ze styles.css, použitelné i na mobilu. */
+.admin .topnav .in{gap:16px}
+.admin-links{display:flex;gap:18px;overflow-x:auto;scrollbar-width:none}
+.admin-links a.is-active{color:var(--accent);opacity:1;font-weight:600}
+.admin-main{display:grid;gap:24px;padding-top:40px;max-width:860px}
+.admin h1{font-size:clamp(28px,4vw,40px);letter-spacing:-.03em}
+.admin h1 small{font-size:.5em;color:var(--muted);font-weight:500}
+.admin h2{font-size:24px;margin-top:12px}
+.admin-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.admin-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.admin-kpis a{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;text-decoration:none;color:inherit;display:grid;gap:4px}
+.admin-kpis b{font-size:40px;line-height:1;font-family:var(--f-display);letter-spacing:-.03em}
+.admin-kpis span{color:var(--muted);font-size:14px}
+@media (max-width:620px){.admin-kpis{grid-template-columns:1fr}}
+.admin-actions{display:flex;flex-wrap:wrap;gap:10px}
+.admin .btn{font-size:15px;padding:10px 18px}
+.admin .btn.is-danger{color:var(--risk)}
+.admin-filter{justify-self:start}
+.admin-list{list-style:none;margin:0;padding:0;background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.admin-list li{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:0 16px 0 0}
+.admin-list li:first-child{border-top:0}
+.admin-list li>a{flex:1;min-width:0;display:grid;gap:2px;padding:12px 16px;text-decoration:none;color:inherit}
+.admin-list li>a:hover b{color:var(--accent)}
+.admin-list li span{color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-list li em{font-style:normal;font-size:12px;color:var(--muted);background:var(--sunk);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.admin-list li.tip{display:grid;gap:12px;padding:16px}
+.admin-list li.tip a{word-break:break-all}
+.admin-list li.tip p{margin:4px 0}
+.admin-list li.tip small{color:var(--muted)}
+.admin-list li.tip form{display:flex;flex-wrap:wrap;gap:8px}
+.admin-list li.is-rejected,.admin-list li.is-approved{opacity:.6}
+.admin-form{gap:18px}
+.admin-field{display:grid;gap:6px;border:0;margin:0;padding:0;min-width:0}
+.admin-field label,.admin-field legend{font-weight:600;font-size:15px;padding:0}
+.admin-field small{color:var(--muted);font-size:13px}
+.admin-field input,.admin-field select,.admin-field textarea{font:inherit;font-size:16px;width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.admin-field textarea{resize:vertical}
+.admin-cats{display:flex;flex-wrap:wrap;gap:8px 18px}
+.admin-check{display:flex;align-items:center;gap:8px;font-size:16px}
+.admin-check input{width:18px;height:18px}

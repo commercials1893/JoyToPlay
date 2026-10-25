@@ -1,0 +1,22 @@
+{
+  // Joy To Play: web z Workeru a D1. Stejný kód půjde i jako Cloudflare Pages (_worker.js), viz README.
+  "name": "joytoplay",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "account_id": "ce3b3fa05b85ae67893475ab2d6a4017",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": { "directory": "public", "binding": "ASSETS" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "joytoplay", "database_id": "d93ce5f6-7fb3-43c9-8f47-170b4962eaf5" }
+  ],
+  "vars": {
+    "SITE_URL": "https://kytara.tomasjindra.cz",
+    // Turnstile: zatím testovací klíč Cloudflare (projde vždy). Ostrý klíč doplní Tomáš po založení widgetu.
+    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA",
+    // Cloudflare Access pro /admin: doplní se po nastavení Access (tým a AUD aplikace).
+    "ACCESS_TEAM": "",
+    "ACCESS_AUD": ""
+  },
+  "observability": { "enabled": true }
+}

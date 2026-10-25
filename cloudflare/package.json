@@ -1,0 +1,13 @@
+{
+  "name": "joytoplay",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node scripts/convert.mjs > data/seed.sql",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}
