@@ -203,7 +203,7 @@ function bindForm() {
     try {
       const token = await captcha.token();
       if (!token) {
-        say("Ještě chvilku, ověřuju, že nejsi robot. Pak to zkus odeslat znovu.", false);
+        say("Ještě ověřuju, že nejsi robot. Když se nad tlačítkem objeví políčko, zaškrtni ho a pošli tip znovu.", false);
         return;
       }
       sent = true;
