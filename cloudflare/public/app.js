@@ -13,9 +13,9 @@ const esc = (text) =>
 
 function thumbHTML(video) {
   return `
-      <a class="thumb" href="https://www.youtube.com/watch?v=${esc(video.id)}" data-play="${esc(video.id)}" aria-label="Přehrát ${esc(video.song)}">
+      <a class="thumb" href="https://www.youtube.com/watch?v=${esc(video.id)}" data-play="${esc(video.id)}" aria-label="Přehrát video ${esc(video.song)} tady na stránce">
         <img src="https://i.ytimg.com/vi/${esc(video.id)}/hqdefault.jpg" alt="" loading="lazy">
-        <span class="play">Přehrát na YouTube</span>
+        <span class="play">▶︎ Přehrát</span>
       </a>`;
 }
 
@@ -30,6 +30,10 @@ function cardHTML(video) {
           <span>Čas <b>${esc(video.time)}</b></span>
         </div>
         <p class="comment"><strong>${esc(video.title)}</strong><span>${esc(video.comment)}</span></p>
+        <div class="card-actions">
+          <a class="btn btn-primary" href="/video/${esc(video.slug)}">Návod</a>
+          <a class="btn btn-quiet" href="https://www.youtube.com/watch?v=${esc(video.id)}" target="_blank" rel="noreferrer">Přehrát na YouTube</a>
+        </div>
       </div>
     </article>
   `;
@@ -43,69 +47,46 @@ function newestFirst(videos) {
     .map(({ video }) => video);
 }
 
-// Rychlý výběr písničky v právě vybrané sekci: písmena a po kliknutí na některé štítky písniček od něj.
-// Klik na písničku ukáže jen její video, druhý klik vrátí celou sekci. Krátké sekce se obejdou bez písmen.
-const LETTERS_FROM = 10;
-
-function renderPicks(videos, filter, shown, picked, letter) {
-  const lettersRoot = document.getElementById("song-letters");
-  const root = document.getElementById("song-picks");
-  const initial = (video) => plain(video.song)[0].toUpperCase();
-  const sorted = [...shown].sort((a, b) => a.song.localeCompare(b.song, "cs"));
-  const useLetters = sorted.length > LETTERS_FROM;
-  const letters = [...new Set(sorted.map(initial))];
-  const current = letters.includes(letter) ? letter : null;
-
-  lettersRoot.hidden = !useLetters;
-  lettersRoot.replaceChildren(
-    ...letters.map((value) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = value === current ? "is-on" : "";
-      button.textContent = value;
-      button.addEventListener("click", () => render(videos, filter, null, value === current ? null : value));
-      return button;
-    }),
-  );
-  root.hidden = sorted.length < 2 || (useLetters && !current);
-  root.replaceChildren(
-    ...sorted
-      .filter((video) => !useLetters || initial(video) === current)
-      .map((video) => {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "chip";
-        chip.setAttribute("aria-pressed", String(video.id === picked));
-        chip.textContent = video.song;
-        chip.addEventListener("click", () => render(videos, filter, video.id === picked ? null : video.id, current));
-        return chip;
-      }),
-  );
-}
-
 // Videa se ukazují po deseti, další přidá tlačítko pod nimi. Změna sekce začíná zase od začátku.
 const PAGE_SIZE = 10;
 let shown = { filter: null, limit: PAGE_SIZE, last: null };
 
-function render(videos, filter, picked = null, letter = null) {
+// Hledání jde přes všechna videa (písnička, interpret, kanál), bez ohledu na diakritiku; vybraná sekce se při něm neuplatní.
+function render(videos, filter, query = "") {
   const root = document.getElementById("videos");
   const more = document.getElementById("videos-more");
-  if (filter !== shown.filter) shown = { filter, limit: PAGE_SIZE };
-  shown.last = [videos, filter, picked, letter];
-  const source = filter === "latest" ? newestFirst(videos) : videos;
+  const key = query ? `?${query}` : filter;
+  if (key !== shown.filter) shown = { filter: key, limit: PAGE_SIZE };
+  shown.last = [videos, filter, query];
+  const needle = plain(query.trim());
+  const source = filter === "latest" || needle ? newestFirst(videos) : videos;
   const filtered = source.filter((video) => {
+    if (needle) return plain(`${video.song} ${video.artist || ""} ${video.channel}`).includes(needle);
     if (filter === "all" || filter === "latest") return true;
     if (filter === "top") return video.top;
     return video.categories.includes(filter);
   });
-  renderPicks(videos, filter, filtered, picked, letter);
-  const cards = picked ? filtered.filter((video) => video.id === picked) : filtered.slice(0, shown.limit);
-  const rest = picked ? 0 : filtered.length - cards.length;
+  const cards = filtered.slice(0, shown.limit);
+  const rest = filtered.length - cards.length;
   more.hidden = rest <= 0;
   more.textContent = `Zobrazit další (${rest})`;
   root.innerHTML = cards.length
     ? cards.map(cardHTML).join("")
-    : `<p class="empty">V téhle sekci zatím nic není. TJ sem přidá jen to, co opravdu stojí za čas.</p>`;
+    : needle
+      ? `<p class="empty">Na „${esc(query.trim())}“ tu zatím žádné video není. Zkus <a href="/zpevnik">zpěvník</a>.</p>`
+      : `<p class="empty">V téhle sekci zatím nic není. TJ sem přidá jen to, co opravdu stojí za čas.</p>`;
+}
+
+let current = "latest";
+
+function bindSearch(videos) {
+  const search = document.getElementById("video-search");
+  if (!search) return;
+  search.addEventListener("input", () => {
+    const query = search.value;
+    document.querySelectorAll("[data-filter]").forEach((el) => el.setAttribute("aria-selected", String(!query.trim() && el.dataset.filter === current)));
+    render(videos, current, query);
+  });
 }
 
 function bindFilters(videos) {
@@ -113,6 +94,9 @@ function bindFilters(videos) {
     btn.addEventListener("click", () => {
       document.querySelectorAll("[data-filter]").forEach((el) => el.setAttribute("aria-selected", String(el === btn)));
       const filter = btn.dataset.filter;
+      const search = document.getElementById("video-search");
+      if (search) search.value = "";
+      current = filter;
       render(videos, filter);
       history.replaceState(null, "", `/#videa`);
       document.querySelectorAll(".topnav a").forEach((a) => {
@@ -388,6 +372,7 @@ function init() {
   if (!SITE.videos) return;
   const videos = SITE.videos;
   bindFilters(videos);
+  bindSearch(videos);
   // Odkaz z detailu videa (/?f=three#videa) otevře rovnou danou sekci.
   const start = new URLSearchParams(location.search).get("f");
   const tab = start && document.querySelector(`[data-filter="${CSS.escape(start)}"]`);

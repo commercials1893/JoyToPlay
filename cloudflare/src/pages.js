@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "34";
+const ASSET_V = "35";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -79,16 +79,27 @@ ${body}
 const footer = `<footer>Joy To Play · Nauč se málo. Zahraj hodně. · Videa vybírám ručně. TJ</footer>`;
 
 function thumb(v, eager = false) {
-  return `<a class="thumb" href="${ytUrl(v.youtube_id)}" data-play="${esc(v.youtube_id)}" aria-label="Přehrát ${esc(v.song)}">
+  return `<a class="thumb" href="${ytUrl(v.youtube_id)}" data-play="${esc(v.youtube_id)}" aria-label="Přehrát video ${esc(v.song)} tady na stránce">
         <img src="https://i.ytimg.com/vi/${esc(v.youtube_id)}/hqdefault.jpg" alt=""${eager ? "" : ' loading="lazy"'}>
-        <span class="play">Přehrát na YouTube</span>
+        <span class="play">▶︎ Přehrát</span>
       </a>`;
 }
+
+// Odhad času u videa počítá se základními otevřenými akordy; věta stojí u katalogu i na detailu.
+const TIME_NOTE = `Čas u videa platí, pokud už zvládáš základní otevřené akordy G, C, D, Em a Am. Vyzkoušet si je můžeš v <a href="/akordy">Akordech</a>.`;
 
 function facts(v) {
   return `<div class="facts">
           <span><span class="lvl" aria-hidden="true">${lvl(v.difficulty)}</span>Obtížnost <b>${v.difficulty}/5 · ${LEVELS[v.difficulty]}</b></span>
           <span>Čas <b>${esc(v.time)}</b></span>
+        </div>`;
+}
+
+// Dvě akce na kartě: návod (detail videa na webu) a video na YouTube v nové kartě.
+function actions(v) {
+  return `<div class="card-actions">
+          <a class="btn btn-primary" href="/video/${esc(v.slug)}">Návod</a>
+          <a class="btn btn-quiet" href="${ytUrl(v.youtube_id)}" target="_blank" rel="noreferrer">Přehrát na YouTube</a>
         </div>`;
 }
 
@@ -101,6 +112,7 @@ function card(v) {
         <p class="by">${esc(v.channel)}</p>
         ${facts(v)}
         <p class="comment"><strong>${esc(v.title)}</strong><span>${esc(v.comment)}</span></p>
+        ${actions(v)}
       </div>
     </article>`;
 }
@@ -113,7 +125,7 @@ export function homePage(data, env) {
   ];
   const clientData = {
     videos: data.videos.map((v) => ({
-      id: v.youtube_id, slug: v.slug, title: v.title, song: v.song, channel: v.channel,
+      id: v.youtube_id, slug: v.slug, title: v.title, song: v.song, artist: v.artist, channel: v.channel,
       difficulty: v.difficulty, time: v.time, categories: v.categories, top: !!v.top, comment: v.comment, added: v.added,
     })),
   };
@@ -165,8 +177,8 @@ export function homePage(data, env) {
         <div class="tabs" role="tablist">
           ${tabs.map(([key, label], i) => `<button class="tab" role="tab" aria-selected="${i === 0}" data-filter="${esc(key)}" type="button">${esc(label)}</button>`).join("\n          ")}
         </div>
-        <div class="letters" id="song-letters"></div>
-        <div class="song-picks" id="song-picks"></div>
+        <input class="song-search" id="video-search" type="search" placeholder="Hledat písničku nebo interpreta" aria-label="Hledat ve videích">
+        <p class="time-note">${TIME_NOTE}</p>
       </div>
       <div id="videos" class="videos"></div>
       <noscript><ul>${data.videos.map((v) => `<li><a href="/video/${esc(v.slug)}">${esc(v.song)}</a></li>`).join("")}</ul></noscript>
@@ -460,10 +472,11 @@ export function videoPage({ video: v, categories, songs, related }, env) {
       <article class="video-card detail-card">${thumb(v, true)}
         <div class="card-body">
           ${facts(v)}
+          <p class="time-note is-left">${TIME_NOTE}</p>
           <p class="comment"><strong>${esc(v.title)}</strong><span>${esc(v.comment)}</span></p>
           <div class="detail-actions">
             ${songs.map((s) => `<a class="btn btn-primary" href="${esc(s.chords_url)}" target="_blank" rel="noreferrer">Akordy: ${esc(s.song)}</a>`).join("")}
-            <a class="btn btn-quiet" href="${ytUrl(v.youtube_id)}" target="_blank" rel="noreferrer">Otevřít na YouTube</a>
+            <a class="btn btn-quiet" href="${ytUrl(v.youtube_id)}" target="_blank" rel="noreferrer">Přehrát na YouTube</a>
           </div>
           ${categories.length ? `<div class="detail-tags">${categories.map((c) => `<a class="chip" href="/?f=${esc(c.key)}#videa">${esc(c.label)}</a>`).join("")}</div>` : ""}
         </div>
