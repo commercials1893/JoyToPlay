@@ -23,9 +23,14 @@
 
   // ----- zvuk -----
   let ctx = null;
+  // Režim zvuku Safari: bez mikrofonu „playback“ (hraje i v tichém režimu iPhonu), s mikrofonem si ho Safari zvolí samo.
+  // „play-and-record“ natvrdo nastavovat nejde: Safari pak referenční tóny nepřehrál.
+  function session(type) {
+    try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (_) {}
+  }
   function audio() {
+    if (!listening) session("playback");
     if (!ctx) {
-      try { if (navigator.audioSession) navigator.audioSession.type = "play-and-record"; } catch (_) {}
       ctx = new (window.AudioContext || window.webkitAudioContext)();
     }
     if (ctx.state === "suspended") ctx.resume();
@@ -148,6 +153,7 @@
 
   async function start() {
     audio();
+    session("auto");
     $("lt-mic").disabled = true;
     idle("Čekám na povolení mikrofonu…");
     try {
@@ -173,6 +179,7 @@
     clearInterval(timer);
     if (stream) stream.getTracks().forEach((t) => t.stop());
     stream = null; listening = false;
+    session("playback");
     root.classList.remove("is-on", "is-quiet");
     $("lt-mic").textContent = "Zapnout ladičku";
     $("lt-needle").style.transform = "rotate(0deg)";
