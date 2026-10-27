@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "42";
+const ASSET_V = "43";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -336,7 +336,6 @@ export function aboutPage(env) {
         <article class="tile">
           <div class="eyebrow">O mně</div>
           <h1>Nejsem učitel ani virtuóz</h1>
-          <p>Jsem Tomáš Jindra, podepisuju se TJ.</p>
           <p>Na kytaru hraju asi 30 let. S dlouhými pauzami, ale vždycky jsem se k ní vrátil.</p>
           <p>Mám práci a běžný život jako ty, takže tu najdeš jen to, co se dá zvládnout a udělá radost.</p>
           <p>Hraju na Yamahu LL16 a Epiphone Dove Studio.</p>
