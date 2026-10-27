@@ -1,7 +1,7 @@
 // HTML veřejného webu. Texty webu jsou tady v kódu, data (videa, písničky, sekce, kanály) jdou z D1.
 import { esc } from "./util.js";
 
-const ASSET_V = "41";
+const ASSET_V = "42";
 const LEVELS = ["", "Úplný začátek", "Lehké", "Střední", "Těžší", "Náročné"];
 const TONES = ["var(--a)", "var(--b)", "var(--c)"];
 const DEFAULT_TITLE = "Joy To Play — Nauč se málo. Zahraj hodně.";
@@ -25,7 +25,7 @@ function nav(home, path) {
         <a class="logo" href="${home ? "#top" : "/"}">
           <svg class="logo-pick" viewBox="0 0 100 100" aria-hidden="true">
             <path d="M50 4 C81 4 95 21 91 42 C87 65 67 89 50 96 C33 89 13 65 9 42 C5 21 19 4 50 4 Z"/>
-            <text transform="rotate(-7 50 46)" text-anchor="middle"><tspan x="50" y="40">Karel</tspan><tspan x="50" y="64">Kryl</tspan></text>
+            <text transform="rotate(-7 50 46)" text-anchor="middle"><tspan x="50" y="60">JTP</tspan></text>
           </svg>
           <span>Joy To Play</span>
         </a>
@@ -336,6 +336,7 @@ export function aboutPage(env) {
         <article class="tile">
           <div class="eyebrow">O mně</div>
           <h1>Nejsem učitel ani virtuóz</h1>
+          <p>Jsem Tomáš Jindra, podepisuju se TJ.</p>
           <p>Na kytaru hraju asi 30 let. S dlouhými pauzami, ale vždycky jsem se k ní vrátil.</p>
           <p>Mám práci a běžný život jako ty, takže tu najdeš jen to, co se dá zvládnout a udělá radost.</p>
           <p>Hraju na Yamahu LL16 a Epiphone Dove Studio.</p>
@@ -399,7 +400,7 @@ export function recommendPage(env) {
           <input name="why" type="text" required maxlength="1000" placeholder="Proč to stojí za čas?">
           <input name="_gotcha" type="text" tabindex="-1" autocomplete="off" hidden>
           <div class="turnstile" id="turnstile-box"></div>
-          <button class="btn btn-primary" type="submit">Poslat TJ</button>
+          <button class="btn btn-primary" type="submit">Poslat tip</button>
         </form>
         <p id="recommend-note" hidden></p>
       </div>

@@ -343,6 +343,11 @@
     audio();   // zvuk se musí odemknout přímo v kliknutí, brnknutí přijde až po animaci
     show(byId[b.dataset.id]);
     setTimeout(strumNow, 380);
+    // na mobilu je výběr akordů nad hmatníkem, takže hmatník po kliknutí doscrolluju do výhledu
+    if (matchMedia("(max-width:600px)").matches) {
+      const smooth = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+      root.querySelector(".aa-stage").scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+    }
   });
 
   // ----- Hraj s doprovodem: postup čtyř akordů, rytmus a tempo; web hraje a ukazuje, co přijde -----

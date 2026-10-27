@@ -691,3 +691,9 @@ svg text.lt-lbl{font-size:12px;fill:var(--muted);text-anchor:middle}
 .cc-cur .name{font-size:clamp(48px,7vw,72px)}
 @media (min-width:601px){.cc-progs{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .cc-player{gap:18px}
+/* Mobil: hmatník zůstane pod lištou po doscrollování z výběru akordů, odkazy ve zpěvníku jsou dost velké na prst */
+@media (max-width:600px){
+  .aa-stage{scroll-margin-top:64px}
+  .song-group li{display:flex;flex-wrap:wrap;align-items:center;gap:0 8px;min-height:44px;padding:0}
+  .song-group a{display:inline-block;padding:11px 0;margin-right:0;line-height:22px}
+}
